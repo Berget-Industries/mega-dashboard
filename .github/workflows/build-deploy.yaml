@@ -2,36 +2,23 @@ name: Build and Deploy React Application
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
+      - name: Build Docker image
+        run: docker build -t willebergh/mega-dashboard .
 
-    - name: Install dependencies
-      run: npm install
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Build
-      run: npm run build
-
-    - name: Build Docker image
-      run: docker build -t username/repository:tag .
-
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-    - name: Push Docker image to Docker Hub
-      run: docker push username/repository:tag
+      - name: Push Docker image to Docker Hub
+        run: docker push willebergh/mega-dashboard
