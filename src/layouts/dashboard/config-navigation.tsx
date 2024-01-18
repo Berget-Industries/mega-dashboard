@@ -54,6 +54,7 @@ export function useNavData() {
           { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
           { title: 'Statistik', path: paths.dashboard.analytics, icon: ICONS.analytics },
           { title: 'Ärenden', path: paths.dashboard.tickets.root, icon: ICONS.booking },
+          { title: 'Inställningar', path: paths.dashboard.settings, icon: ICONS.lock },
         ],
       },
     ],

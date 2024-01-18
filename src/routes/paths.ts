@@ -19,11 +19,11 @@ export const paths = {
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,
-    fileManager: '',
     analytics: `${ROOTS.DASHBOARD}/analytics`,
     tickets: {
       root: `${ROOTS.DASHBOARD}/tickets`,
       details: (id: string) => `${ROOTS.DASHBOARD}/tickets/details?id=${id}`,
     },
+    settings: `${ROOTS.DASHBOARD}/settings`,
   },
 };

@@ -10,6 +10,7 @@ import { LoadingScreen } from 'src/components/loading-screen';
 
 const IndexPage = lazy(() => import('src/pages/dashboard/index'));
 const Analytics = lazy(() => import('src/pages/dashboard/analytics'));
+const Settings = lazy(() => import('src/pages/dashboard/settings'));
 const Tickets = lazy(() => import('src/pages/dashboard/tickets'));
 const TicketsDetails = lazy(() => import('src/pages/dashboard/ticket-details'));
 
@@ -30,6 +31,7 @@ export const dashboardRoutes = [
     children: [
       { element: <IndexPage />, index: true },
       { path: 'analytics', element: <Analytics /> },
+      { path: 'settings', element: <Settings /> },
       {
         path: 'tickets',
         element: <Outlet />,
