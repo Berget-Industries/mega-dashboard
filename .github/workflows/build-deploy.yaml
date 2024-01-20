@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Run lint
-        run: npm run lint
+        run: npm install && npm run lint
 
   build:
     needs: test
