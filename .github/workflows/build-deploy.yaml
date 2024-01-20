@@ -1,24 +1,56 @@
-name: Build and Deploy React Application
+name: Development
 
 on:
   push:
-    branches: ['release']
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+permissions:
+  contents: read
 
 jobs:
-  build-and-push:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Run lint
+        run: npm install && npm run lint
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
 
       - name: Build Docker image
-        run: docker build -t willebergh/mega-dashboard .
+        run: docker build . -t willebergh/mega-dashboard:dev
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Push Docker image to Docker Hub
-        run: docker push willebergh/mega-dashboard
+      - name: Push Docker image
+        run: docker push willebergh/mega-dashboard:dev
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Update Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CD_SERVER_HOST }}
+          username: ${{ secrets.CD_SERVER_USERNAME }}
+          password: ${{ secrets.CD_SERVER_PASSWORD }}
+          script: ~/mega/update_dashboard.sh
