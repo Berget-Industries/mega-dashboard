@@ -1,0 +1,54 @@
+name: Development
+
+on:
+  push:
+    branches: ['release']
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Run lint
+        run: npm install && npm run lint
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build . -t willebergh/mega-dashboard:release --build-arg REACT_APP_API_KEY=mega-api.prod.berget.industries
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Push Docker image
+        run: docker push willebergh/mega-dashboard:release
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Update Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_SERVER_HOST }}
+          username: ${{ secrets.PROD_SERVER_USERNAME }}
+          password: ${{ secrets.PROD_SERVER_PASSWORD }}
+          script: ~/mega/update_dashboard.sh
