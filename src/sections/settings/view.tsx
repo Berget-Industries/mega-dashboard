@@ -1,14 +1,15 @@
+import React, { useState, useEffect } from 'react';
+import Card from '@mui/material/Card';
+import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
-import Switch from '@mui/material/Switch';
-import Button from '@mui/material/Button';
-import { alpha, useTheme } from '@mui/material/styles';
-import { useSettingsContext } from 'src/components/settings';
-import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
+import { alpha, useTheme } from '@mui/material/styles';
+import { useSettingsContext } from 'src/components/settings';
+import FormDialog from './formDialog';
 
 // ----------------------------------------------------------------------
 type plugin = {
@@ -72,6 +73,7 @@ export default function OverviewAnalyticsView() {
   const [actionTypesInput, setActionTypesInput] = useState<plugin[]>([]);
   const [actionTypesChain, setActionTypesChain] = useState<plugin[]>([]);
   const [actionTypesTool, setActionTypesTool] = useState<plugin[]>([]);
+  const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
     const typeInput = pluginss.filter((_) => _.type === 'input');
@@ -101,10 +103,10 @@ export default function OverviewAnalyticsView() {
           flexWrap="wrap"
           justifyContent="center"
           alignItems="center"
-          spacing={4}
+          spacing={2}
         >
           {plugins.map((plugin) => (
-            <Grid>
+            <Grid xs={2.5}>
               <Card variant="elevation">
                 <CardContent>
                   <Typography variant="h5">{plugin.name}</Typography>
@@ -112,8 +114,10 @@ export default function OverviewAnalyticsView() {
                     {plugin.type}
                   </Typography>
                 </CardContent>
-                <CardActions>
-                  <Button variant="outlined">Ändra konfig</Button>
+                <CardActions sx={{ justifyContent: 'space-between', padding: 3 }}>
+                  <Button onClick={() => setOpen(true)} variant="outlined">
+                    Ändra konfig
+                  </Button>
                   <Switch checked={plugin.isActivated} />
                 </CardActions>
               </Card>
@@ -121,6 +125,7 @@ export default function OverviewAnalyticsView() {
           ))}
         </Grid>
       ))}
+      <FormDialog open={open} setOpen={setOpen} />
     </Container>
   );
 }
