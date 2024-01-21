@@ -70,19 +70,26 @@ export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const theme = useTheme();
 
+  const [plugins, setPlugins] = useState(pluginss);
+
   const [actionTypesInput, setActionTypesInput] = useState<plugin[]>([]);
   const [actionTypesChain, setActionTypesChain] = useState<plugin[]>([]);
   const [actionTypesTool, setActionTypesTool] = useState<plugin[]>([]);
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
-    const typeInput = pluginss.filter((_) => _.type === 'input');
-    const typeChain = pluginss.filter((_) => _.type === 'chain');
-    const typeTool = pluginss.filter((_) => _.type === 'tool');
+    const typeInput = plugins.filter((_) => _.type === 'input');
+    const typeChain = plugins.filter((_) => _.type === 'chain');
+    const typeTool = plugins.filter((_) => _.type === 'tool');
 
     setActionTypesInput(typeInput);
     setActionTypesChain(typeChain);
     setActionTypesTool(typeTool);
+  }, []);
+
+  useEffect(() => {
+    // const response = useApi();
+    // setPlugins(response.plugins)
   }, []);
 
   return (
