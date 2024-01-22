@@ -133,7 +133,6 @@ export function AuthProvider({ children }: Props) {
     };
 
     const res = await axios.post(endpoints.auth.login, data);
-
     const { accessToken, user } = res.data;
 
     setSession(accessToken);
@@ -144,6 +143,8 @@ export function AuthProvider({ children }: Props) {
         user: {
           ...user,
           accessToken,
+          // Lägg till 'systemAdmin' attributet här
+          systemAdmin: user.systemAdmin,
         },
       },
     });
@@ -199,6 +200,7 @@ export function AuthProvider({ children }: Props) {
       loading: status === 'loading',
       authenticated: status === 'authenticated',
       unauthenticated: status === 'unauthenticated',
+      isSystemAdmin: state.user?.systemAdmin ?? false,
       //
       login,
       register,

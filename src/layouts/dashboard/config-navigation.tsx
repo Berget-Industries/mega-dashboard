@@ -4,6 +4,8 @@ import { paths } from 'src/routes/paths';
 
 import SvgColor from 'src/components/svg-color';
 
+import { useAuthContext } from 'src/auth/hooks';
+
 // ----------------------------------------------------------------------
 
 const icon = (name: string) => (
@@ -44,22 +46,25 @@ const ICONS = {
 // ----------------------------------------------------------------------
 
 export function useNavData() {
-  const data = useMemo(
-    () => [
-      // OVERVIEW
-      // ----------------------------------------------------------------------
+  const { user } = useAuthContext();
+
+  const data = useMemo(() => {
+    const items = [
+      { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
+      { title: 'Statistik', path: paths.dashboard.analytics, icon: ICONS.analytics },
+      { title: 'Ärenden', path: paths.dashboard.tickets.root, icon: ICONS.booking },
+    ];
+    if (user?.systemAdmin) {
+      items.push({ title: 'Inställningar', path: paths.dashboard.settings, icon: ICONS.lock });
+    }
+
+    return [
       {
         subheader: 'Översikt',
-        items: [
-          { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
-          { title: 'Statistik', path: paths.dashboard.analytics, icon: ICONS.analytics },
-          { title: 'Ärenden', path: paths.dashboard.tickets.root, icon: ICONS.booking },
-          { title: 'Inställningar', path: paths.dashboard.settings, icon: ICONS.lock },
-        ],
+        items,
       },
-    ],
-    []
-  );
+    ];
+  }, [user]);
 
   return data;
 }
