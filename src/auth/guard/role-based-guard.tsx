@@ -16,8 +16,7 @@ type RoleBasedGuardProp = {
 };
 
 export default function RoleBasedGuard({ hasContent, children, sx }: RoleBasedGuardProp) {
-  const { user } = useAuthContext();
-  const isSystemAdmin = user?.systemAdmin;
+  const { isSystemAdmin } = useAuthContext();
 
   if (!isSystemAdmin) {
     return hasContent ? (

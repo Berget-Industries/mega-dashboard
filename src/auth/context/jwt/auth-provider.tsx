@@ -143,8 +143,6 @@ export function AuthProvider({ children }: Props) {
         user: {
           ...user,
           accessToken,
-          // Lägg till 'systemAdmin' attributet här
-          systemAdmin: user.systemAdmin,
         },
       },
     });
