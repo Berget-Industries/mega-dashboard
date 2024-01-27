@@ -33,7 +33,11 @@ export const dashboardRoutes = [
       { path: 'analytics', element: <Analytics /> },
       {
         path: 'settings',
-        element: <Settings />,
+        element: (
+          <RoleBasedGuard hasContent>
+            <Settings />
+          </RoleBasedGuard>
+        ),
       },
       {
         path: 'tickets',
