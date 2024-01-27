@@ -9,7 +9,6 @@ import { varBounce, MotionContainer } from 'src/components/animate';
 import { useAuthContext } from '../hooks';
 
 type RoleBasedGuardProp = {
-  hasContent?: boolean;
   children: React.ReactNode;
   sx?: SxProps<Theme>;
 };
