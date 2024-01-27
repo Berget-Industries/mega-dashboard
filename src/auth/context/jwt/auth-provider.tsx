@@ -198,7 +198,6 @@ export function AuthProvider({ children }: Props) {
       loading: status === 'loading',
       authenticated: status === 'authenticated',
       unauthenticated: status === 'unauthenticated',
-      isSystemAdmin: state.user?.systemAdmin ?? false,
       //
       login,
       register,
