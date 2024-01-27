@@ -14,11 +14,11 @@ type RoleBasedGuardProp = {
   sx?: SxProps<Theme>;
 };
 
-export default function RoleBasedGuard({ hasContent, children, sx }: RoleBasedGuardProp) {
+export default function RoleBasedGuard({ children, sx }: RoleBasedGuardProp) {
   const { user } = useAuthContext();
 
   if (!user?.systemAdmin) {
-    return hasContent ? (
+    return (
       <Container component={MotionContainer} sx={{ textAlign: 'center', ...sx }}>
         <m.div variants={varBounce().in}>
           <Typography variant="h3" sx={{ mb: 2 }}>
@@ -41,7 +41,7 @@ export default function RoleBasedGuard({ hasContent, children, sx }: RoleBasedGu
           />
         </m.div>
       </Container>
-    ) : null;
+    );
   }
   return <> {children} </>;
 }

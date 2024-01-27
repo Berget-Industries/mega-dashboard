@@ -34,7 +34,7 @@ export const dashboardRoutes = [
       {
         path: 'settings',
         element: (
-          <RoleBasedGuard hasContent>
+          <RoleBasedGuard>
             <Settings />
           </RoleBasedGuard>
         ),
