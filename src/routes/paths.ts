@@ -24,9 +24,9 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/tickets`,
       details: (id: string) => `${ROOTS.DASHBOARD}/tickets/details?id=${id}`,
     },
-    settings: `${ROOTS.DASHBOARD}/admin/settings`,
-    organizations: {
-      root: `${ROOTS.DASHBOARD}/admin/organizations`,
+    admin: {
+      settings: `${ROOTS.DASHBOARD}/admin/settings`,
+      organizations: `${ROOTS.DASHBOARD}/admin/organizations`,
     },
   },
 };
