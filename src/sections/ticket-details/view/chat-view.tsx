@@ -12,6 +12,8 @@ import { useGetConversation } from 'src/api/organization';
 
 import { useSettingsContext } from 'src/components/settings';
 
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
+
 import { IChatParticipant } from 'src/types/chat';
 
 import { useAuthContext } from 'src/auth/hooks';
@@ -27,6 +29,8 @@ export default function ChatView() {
 
   const settings = useSettingsContext();
 
+  const { selectedOrg } = useSelectedOrgContext();
+
   const searchParams = useSearchParams();
 
   const selectedConversationId = searchParams.get('id') || '';
@@ -34,7 +38,7 @@ export default function ChatView() {
   const { conversation, conversationLoading, conversationError, conversationValidating } =
     useGetConversation({
       conversation: selectedConversationId,
-      organization: '6567688da895a324a728385d',
+      organization: selectedOrg?._id || '',
     });
 
   console.log(conversation);

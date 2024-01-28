@@ -20,6 +20,7 @@ import AccountPopover from '../common/account-popover';
 import ContactsPopover from '../common/contacts-popover';
 import LanguagePopover from '../common/language-popover';
 import NotificationsPopover from '../common/notifications-popover';
+import OrganizationMenu from '../common/organization-menu';
 
 // ----------------------------------------------------------------------
 
@@ -52,7 +53,9 @@ export default function Header({ onOpenNav }: Props) {
         </IconButton>
       )}
 
-      <Searchbar />
+      <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-start">
+        <Searchbar />
+      </Stack>
 
       <Stack
         flexGrow={1}
@@ -61,6 +64,7 @@ export default function Header({ onOpenNav }: Props) {
         justifyContent="flex-end"
         spacing={{ xs: 0.5, sm: 1 }}
       >
+        <OrganizationMenu />
         <LanguagePopover />
         {/* 
 
