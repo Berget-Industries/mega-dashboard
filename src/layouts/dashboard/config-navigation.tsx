@@ -54,17 +54,25 @@ export function useNavData() {
       { title: 'Statistik', path: paths.dashboard.analytics, icon: ICONS.analytics },
       { title: 'Ärenden', path: paths.dashboard.tickets.root, icon: ICONS.booking },
     ];
-    if (user?.systemAdmin) {
-      items.push({ title: 'Inställningar', path: paths.dashboard.settings, icon: ICONS.lock });
-      items.push({ title: 'Admin', path: paths.dashboard.admin, icon: ICONS.user });
-    }
+    const adminItems = [
+      { title: 'Anpassning', path: paths.dashboard.settings, icon: ICONS.lock },
+      { title: 'Organisationer', path: paths.dashboard.organizations.root, icon: ICONS.banking },
+    ];
 
-    return [
+    const sections = [
       {
         subheader: 'Översikt',
         items,
       },
     ];
+
+    if (user?.systemAdmin) {
+      sections.push({
+        subheader: 'Admin',
+        items: adminItems,
+      });
+    }
+    return sections;
   }, [user]);
 
   return data;

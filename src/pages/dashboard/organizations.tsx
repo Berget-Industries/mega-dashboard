@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> Admin</title>
+        <title> Organisationer</title>
       </Helmet>
 
       <AdminView />

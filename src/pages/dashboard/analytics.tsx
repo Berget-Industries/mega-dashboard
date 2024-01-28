@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> Statistik</title>
+        <title>Statistik</title>
       </Helmet>
 
       <OverviewAnalyticsView />

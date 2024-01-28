@@ -10,7 +10,7 @@ export default function OverviewAnalyticsView() {
           mb: { xs: 3, md: 5 },
         }}
       >
-        Admin 🛠️
+        Organisationer 💸
       </Typography>
     </Container>
   );

@@ -93,7 +93,7 @@ export default function OverviewAnalyticsView() {
           mb: { xs: 3, md: 5 },
         }}
       >
-        Inställningar 🚀 ⚙️
+        Anpassning 🚀 ⚙️
       </Typography>
 
       {[actionTypesInput, actionTypesChain, actionTypesTool].map((plugins) => (

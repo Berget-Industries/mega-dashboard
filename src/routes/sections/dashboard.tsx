@@ -5,13 +5,14 @@ import { AuthGuard, RoleBasedGuard } from 'src/auth/guard';
 import DashboardLayout from 'src/layouts/dashboard';
 
 import { LoadingScreen } from 'src/components/loading-screen';
+import path from 'path';
 
 // ----------------------------------------------------------------------
 
 const IndexPage = lazy(() => import('src/pages/dashboard/index'));
 const Analytics = lazy(() => import('src/pages/dashboard/analytics'));
 const Settings = lazy(() => import('src/pages/dashboard/settings'));
-const Admin = lazy(() => import('src/pages/dashboard/admin'));
+const Organizations = lazy(() => import('src/pages/dashboard/organizations'));
 const Tickets = lazy(() => import('src/pages/dashboard/tickets'));
 const TicketsDetails = lazy(() => import('src/pages/dashboard/ticket-details'));
 
@@ -33,20 +34,30 @@ export const dashboardRoutes = [
       { element: <IndexPage />, index: true },
       { path: 'analytics', element: <Analytics /> },
       {
-        path: 'settings',
-        element: (
-          <RoleBasedGuard>
-            <Settings />
-          </RoleBasedGuard>
-        ),
-      },
-      {
         path: 'admin',
         element: (
           <RoleBasedGuard>
-            <Admin />
+            <Outlet />
           </RoleBasedGuard>
         ),
+        children: [
+          {
+            element: (
+              <RoleBasedGuard>
+                <Settings />
+              </RoleBasedGuard>
+            ),
+            path: 'settings',
+          },
+          {
+            element: (
+              <RoleBasedGuard>
+                <Organizations />
+              </RoleBasedGuard>
+            ),
+            path: 'organizations',
+          },
+        ],
       },
       {
         path: 'tickets',

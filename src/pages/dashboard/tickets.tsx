@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title>Tickets</title>
+        <title>Ärenden</title>
       </Helmet>
 
       <TicketsView />
