@@ -56,6 +56,7 @@ export function useNavData() {
     ];
     if (user?.systemAdmin) {
       items.push({ title: 'Inställningar', path: paths.dashboard.settings, icon: ICONS.lock });
+      items.push({ title: 'Admin', path: paths.dashboard.admin, icon: ICONS.user });
     }
 
     return [

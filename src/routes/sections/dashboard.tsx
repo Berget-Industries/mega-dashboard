@@ -11,6 +11,7 @@ import { LoadingScreen } from 'src/components/loading-screen';
 const IndexPage = lazy(() => import('src/pages/dashboard/index'));
 const Analytics = lazy(() => import('src/pages/dashboard/analytics'));
 const Settings = lazy(() => import('src/pages/dashboard/settings'));
+const Admin = lazy(() => import('src/pages/dashboard/admin'));
 const Tickets = lazy(() => import('src/pages/dashboard/tickets'));
 const TicketsDetails = lazy(() => import('src/pages/dashboard/ticket-details'));
 
@@ -36,6 +37,14 @@ export const dashboardRoutes = [
         element: (
           <RoleBasedGuard>
             <Settings />
+          </RoleBasedGuard>
+        ),
+      },
+      {
+        path: 'admin',
+        element: (
+          <RoleBasedGuard>
+            <Admin />
           </RoleBasedGuard>
         ),
       },
