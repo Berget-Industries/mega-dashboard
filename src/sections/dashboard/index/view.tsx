@@ -9,6 +9,7 @@ import { useSettingsContext } from 'src/components/settings';
 import { useGetOrganizationMessages } from 'src/api/organization';
 import { useEffect, useState } from 'react';
 import { startOfToday, endOfToday } from 'date-fns';
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 import DashboardOnlineStatus from '../dashboard-online-status';
 import DashboardWidgetSummaryToday from '../dashboard-widget-summary-today';
@@ -21,10 +22,11 @@ import Dashboard24hGraph from '../dashboard-24h-graph';
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const theme = useTheme();
+  const { selectedOrg } = useSelectedOrgContext();
 
   const { messages, messagesLoading, messagesError, messagesValidating, messagesEmpty } =
     useGetOrganizationMessages({
-      organization: '6567688da895a324a728385d',
+      organization: selectedOrg?._id || '',
       startDate: startOfToday(),
       endDate: endOfToday(),
     });

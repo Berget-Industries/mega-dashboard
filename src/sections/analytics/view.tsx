@@ -8,6 +8,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { useSettingsContext } from 'src/components/settings';
 import { startOfMonth, endOfMonth, getMonth, lastDayOfMonth, getDay, getDate } from 'date-fns';
 
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
 import AnalyticsSimpleWidget from './analytics-simple-widget';
 import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
@@ -29,10 +30,11 @@ export default function OverviewAnalyticsView() {
 
   const startDate = new Date(currentYear, currentMonth, firstDayOfCurrentMonth, 0, 0, 0);
   const endDate = new Date(currentYear, currentMonth, lastDayOfCurrentMonth, 23, 59, 59);
+  const { selectedOrg } = useSelectedOrgContext();
 
   const { messages, messagesLoading, messagesError, messagesValidating, messagesEmpty } =
     useGetOrganizationMessages({
-      organization: '6567688da895a324a728385d',
+      organization: selectedOrg?._id || '',
       startDate,
       endDate,
     });

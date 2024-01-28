@@ -13,6 +13,8 @@ import { useGetOrganizationConversations, useGetOrganizationMessages } from 'src
 
 import { useSettingsContext } from 'src/components/settings';
 
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
+
 import TicketSummaryCard from '../ticket-summary-card';
 import TicketsTable from '../ticket-table';
 
@@ -25,13 +27,15 @@ export default function OverviewBookingView() {
 
   const settings = useSettingsContext();
 
+  const { selectedOrg } = useSelectedOrgContext();
+
   const {
     conversations,
     conversationsLoading,
     conversationsError,
     conversationsValidating,
     conversationsEmpty,
-  } = useGetOrganizationConversations('6567688da895a324a728385d');
+  } = useGetOrganizationConversations(selectedOrg?._id || '');
 
   const [numberOfProcessedTickets, setNumberOfProcessedTickets] = useState<number>(0);
   const [numberOfTicketsInQueue, setNumberOfTicketsInQueue] = useState<number>(0);
