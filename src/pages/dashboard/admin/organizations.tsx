@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-import SettingsView from 'src/sections/settings/view';
-import AdminView from 'src/sections/admin/view';
+import OrganizationView from 'src/sections/organizations/view';
 
 // ----------------------------------------------------------------------
 
@@ -9,10 +8,10 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> Organisationer</title>
+        <title>Organisationer</title>
       </Helmet>
 
-      <AdminView />
+      <OrganizationView />
     </>
   );
 }
