@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 import { HOST_API } from 'src/config-global';
 
@@ -17,10 +17,22 @@ export default axiosInstance;
 
 export const fetcher = async (args: string | [string, AxiosRequestConfig]) => {
   const [url, config] = Array.isArray(args) ? args : [args];
-
+  console.log('Fetching data from URL:', url);
   const res = await axiosInstance.get(url, { ...config });
 
   return res.data;
+};
+
+export const poster = async <T>(url: string, data: object): Promise<T> => {
+  console.log('Posting data to URL:', url);
+  try {
+    const res = await axiosInstance.post<T>(url, data);
+    console.log('Post successful:', res.data);
+    return res.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+    throw error as AxiosError;
+  }
 };
 
 // ----------------------------------------------------------------------
@@ -37,5 +49,16 @@ export const endpoints = {
     conversations: '/api/dashboard/conversations',
     conversation: '/api/dashboard/conversation',
     messages: '/api/dashboard/messages',
+  },
+  admin: {
+    organizationList: '/api/admin/organization/list',
+    organizationCreate: '/api/admin/organization/create',
+    organizationRemove: '/api/admin/organization/remove',
+    userList: '/api/admin/user/list',
+    userCreate: '/api/admin/user/create',
+    userRemove: '/api/admin/user/remove',
+    apiKeyList: '/api/admin/api-key/list',
+    apiKeyCreate: '/api/admin/api-key/create',
+    apiKeyRemove: '/api/admin/api-key/remove',
   },
 };

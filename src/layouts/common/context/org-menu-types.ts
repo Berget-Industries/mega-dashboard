@@ -1,14 +1,10 @@
 import React, { createContext, ReactNode } from 'react';
 
-interface Organization {
-  _id: string;
-  name: string;
-  logoUrl: string;
-}
+import { IOrganization } from 'src/types/organization';
 
 interface SelectedOrgContextType {
-  selectedOrg: Organization | undefined;
-  setSelectedOrg: (org: Organization) => void;
+  selectedOrg: IOrganization | undefined;
+  setSelectedOrg: (org: IOrganization) => void;
 }
 
 export const SelectedOrgContext = createContext<SelectedOrgContextType>({
