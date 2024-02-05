@@ -15,19 +15,27 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
+// eslint-disable-next-line import/no-cycle
 import ConfirmDialog from './confirmDialog';
 
 // ----------------------------------------------------------------------
 
-interface IOrganizationTableRow {
+export interface IOrganizationTableRow {
   id: string;
   organization: {
-    plugins: string[];
+    plugins: IPlugin[];
     id: string;
     name: string;
     logoUrl: string;
     users: string[];
   };
+}
+
+export interface IPlugin {
+  _id: string;
+  name: string;
+  type: string;
+  isActivated: boolean;
 }
 
 type Props = {
@@ -38,6 +46,7 @@ type Props = {
 export default function OrderTableRow({ row, selected }: Props) {
   const { organization } = row;
   const [open, setOpen] = React.useState(false);
+  const hasActivatedPlugins = organization.plugins.some((plugin) => plugin.isActivated);
 
   const handleToggleDialog = () => {
     setOpen(!open);
@@ -67,6 +76,21 @@ export default function OrderTableRow({ row, selected }: Props) {
       <TableCell sx={{ verticalAlign: 'middle' }}>
         <ListItemText
           primary={organization.users.length}
+          primaryTypographyProps={{
+            typography: 'body2',
+            noWrap: true,
+            textAlign: 'center',
+          }}
+          secondaryTypographyProps={{
+            mt: 0.5,
+            component: 'span',
+            typography: 'caption',
+          }}
+        />
+      </TableCell>
+      <TableCell sx={{ verticalAlign: 'middle' }}>
+        <ListItemText
+          primary={`${organization.plugins.reduce((acc, plugin) => acc + (plugin.isActivated ? 1 : 0), 0)}/${organization.plugins.length}`}
           primaryTypographyProps={{
             typography: 'body2',
             noWrap: true,
@@ -112,15 +136,18 @@ export default function OrderTableRow({ row, selected }: Props) {
             setOpen(true);
           }}
           sx={{ color: 'error.main' }}
+          disabled={!hasActivatedPlugins}
         >
           <Iconify icon="ant-design:stop-outlined" />
-          Inaktivera organisation
+          Inaktivera alla plugins
         </MenuItem>
       </CustomPopover>
       <ConfirmDialog
         open={open}
         handleClose={handleToggleDialog}
         organization={organization.name}
+        organizationId={organization.id}
+        plugins={organization.plugins}
       />
     </>
   );

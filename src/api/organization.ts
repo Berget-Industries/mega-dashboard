@@ -4,8 +4,10 @@ import { useMemo, useCallback } from 'react';
 import { poster, fetcher, endpoints } from 'src/utils/axios';
 
 import { IMessage } from 'src/types/message';
+// eslint-disable-next-line import/no-cycle
 import { IOrganization } from 'src/types/organization';
 import { IConversation } from 'src/types/conversations';
+import { IPlugin } from 'src/sections/organizations/table-row';
 
 // ----------------------------------------------------------------------
 
@@ -134,4 +136,23 @@ export function usePostOrganizations() {
   }, []);
 
   return { createOrganization };
+}
+
+export function usePostDeactivatePlugins() {
+  const deactivatePlugins = useCallback(async (organizationId: string, plugins: IPlugin[]) => {
+    const deactivatePromises = plugins.map((plugin) =>
+      poster(endpoints.admin.deactivatePlugins, {
+        organizationId,
+        name: plugin.name,
+      })
+    );
+
+    const responses = await Promise.all(deactivatePromises);
+
+    await mutate(endpoints.admin.organizationList);
+
+    return responses;
+  }, []);
+
+  return { deactivatePlugins };
 }

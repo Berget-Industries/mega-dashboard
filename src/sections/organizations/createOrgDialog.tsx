@@ -49,7 +49,6 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       return;
     }
 
-    // Validera att det finns minst en icke-tom användare om din logik kräver det
     const nonEmptyUsers = users.filter((user) => user.trim() !== '');
     if (nonEmptyUsers.length === 0) {
       alert('Minst en användare måste anges.');
@@ -57,17 +56,14 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
     }
 
     try {
-      // Använd createOrganization funktionen från hook
       await createOrganization(organizationData);
       console.log('Organisationen skapades.');
 
-      // Stäng dialogen eller rensa formuläret efter framgångsrik skapelse
       setUsers(['']);
       setOrganizationName('');
       setLogoUrl('');
     } catch (error) {
       console.error('Fel vid skapande av organisation:', error);
-      // Visa ett användarvänligt felmeddelande här om du har ett sådant system på plats
     }
   };
 

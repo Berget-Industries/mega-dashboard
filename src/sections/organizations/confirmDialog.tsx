@@ -1,25 +1,32 @@
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import { useTheme } from '@mui/material/styles';
+import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
+import DialogContentText from '@mui/material/DialogContentText';
+
+// eslint-disable-next-line import/no-cycle
+import { usePostDeactivatePlugins } from 'src/api/organization';
+import { IPlugin } from './table-row';
 
 interface CreateOrgDialogProps {
   open: boolean;
   handleClose: () => void;
   organization: string;
+  organizationId: string;
+  plugins: IPlugin[];
 }
 
 export default function ConfirmDialog(props: CreateOrgDialogProps) {
-  const { open, handleClose, organization } = props;
+  const { open, handleClose, organization, organizationId, plugins } = props;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const { deactivatePlugins } = usePostDeactivatePlugins();
 
   const handleRemove = () => {
-    console.log('Removed Org');
+    deactivatePlugins(organizationId, plugins);
     handleClose();
   };
 
@@ -37,7 +44,7 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
     >
       <DialogTitle id="responsive-dialog-title">Är du säker?</DialogTitle>
       <DialogContent>
-        <DialogContentText>Vill du inaktivera {organization}?</DialogContentText>
+        <DialogContentText>Vill du inaktivera alla plugins för {organization}?</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={handleCloseDialog}>

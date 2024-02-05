@@ -54,6 +54,7 @@ export const endpoints = {
     organizationList: '/api/admin/organization/list',
     organizationCreate: '/api/admin/organization/create',
     organizationRemove: '/api/admin/organization/remove',
+    deactivatePlugins: '/api/admin/plugin/deactivate',
     userList: '/api/admin/user/list',
     userCreate: '/api/admin/user/create',
     userRemove: '/api/admin/user/remove',
