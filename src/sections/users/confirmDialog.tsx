@@ -47,7 +47,7 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
           Avbryt
         </Button>
         <Button onClick={handleRemove} autoFocus>
-          Inaktivera
+          Ta bort användare
         </Button>
       </DialogActions>
     </Dialog>
