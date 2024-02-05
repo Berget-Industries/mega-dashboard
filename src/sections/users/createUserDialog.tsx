@@ -101,7 +101,6 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
           <InputLabel id="org-select-label">Välj en eller flera organisationer</InputLabel>
           <Select
             style={{ maxHeight: 300, overflowY: 'auto' }}
-            key={open ? 'open' : 'closed'}
             labelId="org-select-label"
             id="org-select"
             multiple
@@ -117,7 +116,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
             }}
           >
             {organization.map((org) => (
-              <MenuItem key={org._id} value={org._id}>
+              <MenuItem key={org._id} value={org._id} sx={{ padding: '10px 16px' }}>
                 {org.name}
               </MenuItem>
             ))}
