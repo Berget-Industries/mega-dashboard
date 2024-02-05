@@ -44,7 +44,7 @@ interface UserTableProps {
 const TABLE_HEAD = [
   { id: 'userId', label: 'ID', width: 116 },
   { id: 'users', label: 'Användare' },
-  { id: 'company', label: 'Organisation', width: 110 },
+  { id: 'company', label: 'Organisationer', width: 110 },
   { id: '', width: 90 },
 ];
 

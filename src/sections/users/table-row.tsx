@@ -64,6 +64,7 @@ export default function OrderTableRow({ row, selected }: Props) {
 
         <ListItemText
           primary={user.name}
+          secondary={user.email}
           primaryTypographyProps={{ typography: 'body2' }}
           secondaryTypographyProps={{
             component: 'span',
