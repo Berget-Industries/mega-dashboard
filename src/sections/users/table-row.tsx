@@ -109,20 +109,12 @@ export default function OrderTableRow({ row, selected }: Props) {
         <MenuItem
           onClick={() => {
             popover.onClose();
-          }}
-        >
-          <Iconify icon="mdi:plug" />
-          Visa plugins
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            popover.onClose();
             setOpen(true);
           }}
           sx={{ color: 'error.main' }}
         >
-          <Iconify icon="ant-design:stop-outlined" />
-          Inaktivera alla plugins
+          <Iconify icon="solar:trash-bin-minimalistic-outline" />
+          Ta bort användare
         </MenuItem>
       </CustomPopover>
       <ConfirmDialog open={open} handleClose={handleToggleDialog} user={user.name} />

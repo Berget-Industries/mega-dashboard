@@ -23,7 +23,7 @@ type Props = {
   onResetFilters: VoidFunction;
 };
 
-export default function FilterOrganisationBar({
+export default function FilterUserBar({
   filters,
   onFilters,
   //
@@ -54,7 +54,7 @@ export default function FilterOrganisationBar({
           fullWidth
           value={filters.name}
           onChange={handleFilterName}
-          placeholder="Sök efter användare / användarens e-post / användarens ID"
+          placeholder="Sök efter användare / användarens ID"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
