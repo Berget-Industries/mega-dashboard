@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import OverviewUserView from 'src/sections/users/view/view';
 
 // ----------------------------------------------------------------------
 
@@ -8,6 +9,7 @@ export default function Page() {
       <Helmet>
         <title>Användare</title>
       </Helmet>
+      <OverviewUserView />
     </>
   );
 }
