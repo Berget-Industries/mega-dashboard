@@ -36,3 +36,16 @@ export function usePostUsers() {
 
   return { createUser };
 }
+
+export function useRemoveUsers() {
+  const removeUser = useCallback(async (userId: string) => {
+    const response = await poster(endpoints.admin.userRemove, { userId });
+    console.log('Användare skapades:', response);
+
+    await mutate(endpoints.admin.userList);
+
+    return response;
+  }, []);
+
+  return { removeUser };
+}

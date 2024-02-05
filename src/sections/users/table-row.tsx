@@ -117,7 +117,12 @@ export default function OrderTableRow({ row, selected }: Props) {
           Ta bort användare
         </MenuItem>
       </CustomPopover>
-      <ConfirmDialog open={open} handleClose={handleToggleDialog} user={user.name} />
+      <ConfirmDialog
+        open={open}
+        handleClose={handleToggleDialog}
+        user={user.name}
+        userId={user.id}
+      />
     </>
   );
 }

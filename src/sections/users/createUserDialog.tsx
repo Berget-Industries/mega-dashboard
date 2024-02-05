@@ -64,6 +64,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       setOrganizations(['']);
       setUsername('');
       setLogoUrl('');
+      setEmail('');
     } catch (error) {
       console.error('Fel vid skapande av organisation:', error);
     }

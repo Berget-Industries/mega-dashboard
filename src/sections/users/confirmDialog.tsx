@@ -6,19 +6,23 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DialogContentText from '@mui/material/DialogContentText';
+import { useRemoveUsers } from 'src/api/user';
 
 interface CreateOrgDialogProps {
   open: boolean;
   handleClose: () => void;
   user: string;
+  userId: string;
 }
 
 export default function ConfirmDialog(props: CreateOrgDialogProps) {
-  const { open, handleClose, user } = props;
+  const { open, handleClose, user, userId } = props;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const { removeUser } = useRemoveUsers();
 
   const handleRemove = () => {
+    removeUser(userId);
     handleClose();
   };
 
