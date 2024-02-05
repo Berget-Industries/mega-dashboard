@@ -27,6 +27,7 @@ import {
 import OrderTableFiltersResult from 'src/sections/tickets/order-table-filters-result';
 
 import { IUser } from 'src/types/user';
+import { IOrganization } from 'src/types/organization';
 import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
 
 import CreateOrgDialog from './createUserDialog';
@@ -37,6 +38,7 @@ import OrderTableRow, { IUserTableRow } from './table-row';
 
 interface UserTableProps {
   users: IUser[];
+  organizations: IOrganization[];
 }
 
 // ----------------------------------------------------------------------
@@ -92,7 +94,7 @@ function applyFilter({
 
 // ----------------------------------------------------------------------
 
-export default function UserTable({ users }: UserTableProps) {
+export default function UserTable({ users, organizations }: UserTableProps) {
   const table = useTable({ defaultOrderBy: 'date' });
   const confirm = useBoolean();
   const [tableData, setTableData] = useState<IUserTableRow[]>([]);
@@ -244,7 +246,7 @@ export default function UserTable({ users }: UserTableProps) {
           onChangeDense={table.onChangeDense}
         />
       </Card>
-      <CreateOrgDialog open={open} handleClose={handleToggleDialog} />
+      <CreateOrgDialog open={open} handleClose={handleToggleDialog} organization={organizations} />
     </Container>
   );
 }

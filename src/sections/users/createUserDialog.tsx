@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -6,20 +6,28 @@ import {
   DialogActions,
   Button,
   TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  OutlinedInput,
 } from '@mui/material';
 import { usePostUsers } from 'src/api/user';
+import { useGetOrganizations } from 'src/api/organization';
+import { IOrganization } from 'src/types/organization';
 
 interface CreateOrgDialogProps {
   open: boolean;
   handleClose: () => void;
+  organization: IOrganization[];
 }
 
 export default function CreateOrgDialog(props: CreateOrgDialogProps) {
-  const { open, handleClose } = props;
+  const { open, handleClose, organization } = props;
   const [userName, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
-  const [organizations, setOrganizations] = useState<string[]>(['']);
+  const [organizations, setOrganizations] = useState<string[]>([]);
 
   const handleCloseDialog = () => {
     setOrganizations(['']);
@@ -28,17 +36,9 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
     handleClose();
   };
 
-  const handleAddUser = () => {
-    setOrganizations([...organizations, '']);
-  };
-
-  const handleRemoveUser = (index: number) => {
-    setOrganizations(organizations.filter((_, idx) => idx !== index));
-  };
-
   const { createUser } = usePostUsers();
 
-  const handleCreateOrganization = async () => {
+  const handleCreateUser = async () => {
     const userData = {
       name: userName,
       email,
@@ -46,14 +46,10 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       organizations,
     };
 
+    console.log('Dina orginastioner som du vill skicka', organizations);
+
     if (!userName.trim()) {
       alert('Användarens namn får inte vara tomt.');
-      return;
-    }
-
-    const nonEmptyUsers = organizations.filter((organization) => organization.trim() !== '');
-    if (nonEmptyUsers.length === 0) {
-      alert('Minst en organisation måste anges.');
       return;
     }
 
@@ -101,31 +97,27 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
           fullWidth
           variant="outlined"
         />
-        {organizations.map((organization, index) => (
-          <div key={index}>
-            <TextField
-              value={organization}
-              onChange={(e) => {
-                const newOrganization = [...organizations];
-                newOrganization[index] = e.target.value;
-                setOrganizations(newOrganization);
-              }}
-              required
-              margin="normal"
-              label={`Organisation ${index + 1}`}
-              fullWidth
-              variant="outlined"
-            />
-            {organizations.length > 1 && (
-              <Button onClick={() => handleRemoveUser(index)}>Ta bort organisation</Button>
-            )}
-          </div>
-        ))}
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="org-select-label">Organisationer</InputLabel>
+          <Select
+            labelId="org-select-label"
+            id="org-select"
+            multiple
+            value={organizations}
+            onChange={(event) => setOrganizations(event.target.value as string[])}
+            input={<OutlinedInput label="Organisationer" />}
+          >
+            {organization.map((org) => (
+              <MenuItem key={org._id} value={org._id}>
+                {org.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleAddUser}>+ Lägg till organisation</Button>
         <Button onClick={handleCloseDialog}>Avbryt</Button>
-        <Button onClick={handleCreateOrganization} type="submit">
+        <Button onClick={handleCreateUser} type="submit">
           Lägg till
         </Button>
       </DialogActions>
