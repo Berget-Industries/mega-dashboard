@@ -53,13 +53,13 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
 
     const nonEmptyUsers = organizations.filter((organization) => organization.trim() !== '');
     if (nonEmptyUsers.length === 0) {
-      alert('Minst en användare måste anges.');
+      alert('Minst en organisation måste anges.');
       return;
     }
 
     try {
       await createUser(userData);
-      console.log('Organisationen skapades.');
+      console.log('Användare skapades.');
 
       setOrganizations(['']);
       setUsername('');
@@ -71,7 +71,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Lägg till organisation</DialogTitle>
+      <DialogTitle>Lägg till användare</DialogTitle>
       <DialogContent style={{ overflowY: 'auto' }}>
         <TextField
           value={userName}
@@ -79,7 +79,16 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
           autoFocus
           required
           margin="normal"
-          label="Organisationens namn"
+          label="Användarens namn"
+          fullWidth
+          variant="outlined"
+        />
+        <TextField
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          margin="normal"
+          required
+          label="Användarens e-post"
           fullWidth
           variant="outlined"
         />
@@ -102,18 +111,18 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
               }}
               required
               margin="normal"
-              label={`Användare ${index + 1}`}
+              label={`Organisation ${index + 1}`}
               fullWidth
               variant="outlined"
             />
-            {organization.length > 1 && (
-              <Button onClick={() => handleRemoveUser(index)}>Ta bort användare</Button>
+            {organizations.length > 1 && (
+              <Button onClick={() => handleRemoveUser(index)}>Ta bort organisation</Button>
             )}
           </div>
         ))}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleAddUser}>+ Lägg till användare</Button>
+        <Button onClick={handleAddUser}>+ Lägg till organisation</Button>
         <Button onClick={handleCloseDialog}>Avbryt</Button>
         <Button onClick={handleCreateOrganization} type="submit">
           Lägg till

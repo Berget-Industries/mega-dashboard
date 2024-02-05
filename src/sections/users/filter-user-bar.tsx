@@ -54,7 +54,7 @@ export default function FilterOrganisationBar({
           fullWidth
           value={filters.name}
           onChange={handleFilterName}
-          placeholder="Sök efter organisation / organisations ID"
+          placeholder="Sök efter användare / användarens e-post / användarens ID"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
