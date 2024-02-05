@@ -113,7 +113,7 @@ export default function OrderTableRow({ row, selected }: Props) {
           }}
           sx={{ color: 'error.main' }}
         >
-          <Iconify icon="solar:trash-bin-minimalistic-outline" />
+          <Iconify icon="solar:trash-bin-trash-bold" />
           Ta bort användare
         </MenuItem>
       </CustomPopover>
