@@ -30,7 +30,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
   const [organizations, setOrganizations] = useState<string[]>([]);
 
   const handleCloseDialog = () => {
-    setOrganizations(['']);
+    setOrganizations([]);
     setUsername('');
     setLogoUrl('');
     handleClose();
@@ -57,7 +57,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       await createUser(userData);
       console.log('Användare skapades.');
 
-      setOrganizations(['']);
+      setOrganizations([]);
       setUsername('');
       setLogoUrl('');
       setEmail('');
@@ -67,7 +67,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
       <DialogTitle>Lägg till användare</DialogTitle>
       <DialogContent style={{ overflowY: 'auto' }}>
         <TextField
@@ -98,14 +98,15 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
           variant="outlined"
         />
         <FormControl fullWidth margin="normal">
-          <InputLabel id="org-select-label">Organisationer</InputLabel>
+          <InputLabel id="org-select-label">Välj en eller flera organisationer</InputLabel>
           <Select
+            key={open ? 'open' : 'closed'}
             labelId="org-select-label"
             id="org-select"
             multiple
             value={organizations}
             onChange={(event) => setOrganizations(event.target.value as string[])}
-            input={<OutlinedInput label="Organisationer" />}
+            input={<OutlinedInput label="Välj en eller flera organisationer" />}
           >
             {organization.map((org) => (
               <MenuItem key={org._id} value={org._id}>
