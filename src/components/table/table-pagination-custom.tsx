@@ -24,6 +24,10 @@ export default function TablePaginationCustom({
       <TablePagination
         rowsPerPageOptions={rowsPerPageOptions}
         component="div"
+        labelRowsPerPage="Rader per sida:"
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}-${to} av ${count !== -1 ? count : `över ${to}`}`
+        }
         {...other}
         sx={{
           borderTopColor: 'transparent',
@@ -32,7 +36,7 @@ export default function TablePaginationCustom({
 
       {onChangeDense && (
         <FormControlLabel
-          label="Dense"
+          label="Kompakt vy"
           control={<Switch checked={dense} onChange={onChangeDense} />}
           sx={{
             pl: 2,

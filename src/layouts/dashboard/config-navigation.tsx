@@ -59,6 +59,7 @@ export function useNavData() {
     }
     const adminItems = [
       { title: 'Organisationer', path: paths.dashboard.admin.organizations, icon: ICONS.banking },
+      { title: 'Användare', path: paths.dashboard.admin.users, icon: ICONS.user },
     ];
 
     const sections = [
