@@ -28,6 +28,7 @@ export const paths = {
     // ADMIN
     admin: {
       organizations: `${ROOTS.DASHBOARD}/admin/organizations`,
+      users: `${ROOTS.DASHBOARD}/admin/users`,
     },
   },
 };

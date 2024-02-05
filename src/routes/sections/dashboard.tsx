@@ -13,6 +13,7 @@ const IndexPage = lazy(() => import('src/pages/dashboard/index'));
 const Analytics = lazy(() => import('src/pages/dashboard/analytics'));
 const Settings = lazy(() => import('src/pages/dashboard/settings'));
 const Organizations = lazy(() => import('src/pages/dashboard/admin/organizations'));
+const Users = lazy(() => import('src/pages/dashboard/admin/users'));
 const Tickets = lazy(() => import('src/pages/dashboard/tickets'));
 const TicketsDetails = lazy(() => import('src/pages/dashboard/ticket-details'));
 
@@ -52,6 +53,10 @@ export const dashboardRoutes = [
           {
             element: <Organizations />,
             path: 'organizations',
+          },
+          {
+            element: <Users />,
+            path: 'users',
           },
         ],
       },
