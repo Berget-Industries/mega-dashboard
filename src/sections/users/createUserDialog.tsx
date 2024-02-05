@@ -100,6 +100,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
         <FormControl fullWidth margin="normal">
           <InputLabel id="org-select-label">Välj en eller flera organisationer</InputLabel>
           <Select
+            style={{ maxHeight: 300, overflowY: 'auto' }}
             key={open ? 'open' : 'closed'}
             labelId="org-select-label"
             id="org-select"
@@ -107,6 +108,13 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
             value={organizations}
             onChange={(event) => setOrganizations(event.target.value as string[])}
             input={<OutlinedInput label="Välj en eller flera organisationer" />}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 200,
+                },
+              },
+            }}
           >
             {organization.map((org) => (
               <MenuItem key={org._id} value={org._id}>
