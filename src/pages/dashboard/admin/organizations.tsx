@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-import OverviewAnalyticsView from 'src/sections/analytics/view';
+import OrganizationView from 'src/sections/organizations/view';
 
 // ----------------------------------------------------------------------
 
@@ -8,10 +8,10 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title>Statistik</title>
+        <title>Organisationer</title>
       </Helmet>
 
-      <OverviewAnalyticsView />
+      <OrganizationView />
     </>
   );
 }
