@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-import OverviewAnalyticsView from 'src/sections/analytics/view';
+import OverviewAPIKeysView from 'src/sections/api-keys/view/view';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ export default function Page() {
         <title>API Nycklar</title>
       </Helmet>
 
-      <OverviewAnalyticsView />
+      <OverviewAPIKeysView />
     </>
   );
 }
