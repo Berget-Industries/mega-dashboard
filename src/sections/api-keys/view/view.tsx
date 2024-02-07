@@ -1,23 +1,19 @@
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
 
-import { useSettingsContext } from 'src/components/settings';
+import { useGetUsers } from 'src/api/user';
+import { useGetOrganizations } from 'src/api/organization';
+
+import APIKeysTable from '../api-keys-table';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAPIKeysView() {
-  const settings = useSettingsContext();
+  const { users, usersLoading, usersError } = useGetUsers({});
+  const { organizations, organizationsLoading, organizationsError } = useGetOrganizations({});
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: { xs: 3, md: 5 },
-        }}
-      >
-        API Nycklar 🔑
-      </Typography>
+    <Container maxWidth="xl">
+      <APIKeysTable users={users} organizations={organizations} />
     </Container>
   );
 }
