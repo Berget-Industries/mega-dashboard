@@ -9,7 +9,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 
 // eslint-disable-next-line import/no-cycle
 import { usePostDeactivatePlugins } from 'src/api/organization';
-import { IPlugin } from './table-row';
+import { IPlugin } from 'src/types/organization';
 
 interface CreateOrgDialogProps {
   open: boolean;

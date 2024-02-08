@@ -5,9 +5,8 @@ import { poster, fetcher, endpoints } from 'src/utils/axios';
 
 import { IMessage } from 'src/types/message';
 // eslint-disable-next-line import/no-cycle
-import { IOrganization } from 'src/types/organization';
+import { IOrganization, IPlugin } from 'src/types/organization';
 import { IConversation } from 'src/types/conversations';
-import { IPlugin } from 'src/sections/organizations/table-row';
 
 // ----------------------------------------------------------------------
 

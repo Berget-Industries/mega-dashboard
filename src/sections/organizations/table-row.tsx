@@ -1,6 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import MenuItem from '@mui/material/MenuItem';
@@ -9,7 +10,8 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 
-import { useBoolean } from 'src/hooks/use-boolean';
+import { useNavigate } from 'react-router-dom';
+import { IPlugin } from 'src/types/organization';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -31,19 +33,14 @@ export interface IOrganizationTableRow {
   };
 }
 
-export interface IPlugin {
-  _id: string;
-  name: string;
-  type: string;
-  isActivated: boolean;
-}
-
 type Props = {
   row: IOrganizationTableRow;
   selected: boolean;
 };
 
 export default function OrderTableRow({ row, selected }: Props) {
+  const navigate = useNavigate();
+  const [selectedOrg, selectOrg] = useSelectedOrgContext();
   const { organization } = row;
   const [open, setOpen] = React.useState(false);
   const hasActivatedPlugins = organization.plugins.some((plugin) => plugin.isActivated);
@@ -90,7 +87,10 @@ export default function OrderTableRow({ row, selected }: Props) {
       </TableCell>
       <TableCell sx={{ verticalAlign: 'middle' }}>
         <ListItemText
-          primary={`${organization.plugins.reduce((acc, plugin) => acc + (plugin.isActivated ? 1 : 0), 0)}/${organization.plugins.length}`}
+          primary={`${organization.plugins.reduce(
+            (acc, plugin) => acc + (plugin.isActivated ? 1 : 0),
+            0
+          )}/${organization.plugins.length}`}
           primaryTypographyProps={{
             typography: 'body2',
             noWrap: true,
@@ -125,6 +125,8 @@ export default function OrderTableRow({ row, selected }: Props) {
         <MenuItem
           onClick={() => {
             popover.onClose();
+            selectOrg(organization.id);
+            navigate(`/dashboard/settings`);
           }}
         >
           <Iconify icon="mdi:plug" />
