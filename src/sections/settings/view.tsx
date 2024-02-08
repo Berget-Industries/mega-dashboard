@@ -57,7 +57,7 @@ export default function OverviewAnalyticsView() {
     funcToRun({ organizationId: selectedOrg?._id as string, name: plugin.name });
 
     const newPlugins = allPlugins.map((_) =>
-      _.name === plugin.name ? { ..._, isActivated: !_.isActivated } : _
+      _._id === plugin._id ? { ..._, isActivated: !_.isActivated } : _
     );
     setAllPlugins(newPlugins);
   };
@@ -82,6 +82,11 @@ export default function OverviewAnalyticsView() {
           alignItems="center"
           spacing={2}
         >
+          {_plugins.length === 0 && (
+            <Typography variant="h6" color="text.secondary">
+              Inga plugins av denna typ.
+            </Typography>
+          )}
           {_plugins.map((plugin) => (
             <Grid xs={2.5}>
               <Card variant="elevation">
