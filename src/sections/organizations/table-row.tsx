@@ -36,6 +36,7 @@ export interface IPlugin {
   name: string;
   type: string;
   isActivated: boolean;
+  config: object;
 }
 
 type Props = {
@@ -90,7 +91,10 @@ export default function OrderTableRow({ row, selected }: Props) {
       </TableCell>
       <TableCell sx={{ verticalAlign: 'middle' }}>
         <ListItemText
-          primary={`${organization.plugins.reduce((acc, plugin) => acc + (plugin.isActivated ? 1 : 0), 0)}/${organization.plugins.length}`}
+          primary={`${organization.plugins.reduce(
+            (acc, plugin) => acc + (plugin.isActivated ? 1 : 0),
+            0
+          )}/${organization.plugins.length}`}
           primaryTypographyProps={{
             typography: 'body2',
             noWrap: true,

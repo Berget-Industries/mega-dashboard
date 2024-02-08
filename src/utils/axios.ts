@@ -61,5 +61,14 @@ export const endpoints = {
     apiKeyList: '/api/admin/api-key/list',
     apiKeyCreate: '/api/admin/api-key/create',
     apiKeyRemove: '/api/admin/api-key/remove',
+    plugin: {
+      list: '/api/admin/plugin/list',
+      create: '/api/admin/plugin/create',
+      remove: '/api/admin/plugin/remove',
+      update: '/api/admin/plugin/update',
+      activate: '/api/admin/plugin/activate',
+      deactivate: '/api/admin/plugin/deactivate',
+      getAvailablePlugins: '/api/admin/plugin/get-available',
+    },
   },
 };

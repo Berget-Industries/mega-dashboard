@@ -74,6 +74,28 @@ export function useGetOrganizationConversations(organization: string) {
 
 // ----------------------------------------------------------------------
 
+export function useGetOrganizationPlugins({ organizationId }: { organizationId?: string }) {
+  const URL = `${endpoints.admin.plugin.list}${
+    organizationId ? `?organizationId=${organizationId}` : ''
+  }`;
+
+  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+
+  const memoizedValue = useMemo(
+    () => ({
+      plugins: (data?.plugins as IPlugin[]) || [],
+      pluginsLoading: isLoading,
+      pluginsError: error,
+      pluginsValidating: isValidating,
+    }),
+    [data, isLoading, error, isValidating]
+  );
+
+  return memoizedValue;
+}
+
+// ----------------------------------------------------------------------
+
 export function useGetConversation({
   conversation,
   organization,
@@ -155,4 +177,36 @@ export function usePostDeactivatePlugins() {
   }, []);
 
   return { deactivatePlugins };
+}
+
+export function usePlugin() {
+  const activatePlugin = useCallback(
+    async ({ organizationId, name }: { organizationId: string; name: string }) => {
+      const response = await poster(endpoints.admin.plugin.activate, {
+        organizationId,
+        name,
+      });
+
+      await mutate(endpoints.admin.organizationList);
+
+      return response;
+    },
+    []
+  );
+
+  const deactivatePlugin = useCallback(
+    async ({ organizationId, name }: { organizationId: string; name: string }) => {
+      const response = await poster(endpoints.admin.plugin.deactivate, {
+        organizationId,
+        name,
+      });
+
+      await mutate(endpoints.admin.organizationList);
+
+      return response;
+    },
+    []
+  );
+
+  return { activatePlugin, deactivatePlugin };
 }
