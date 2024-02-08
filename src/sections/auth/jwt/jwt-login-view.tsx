@@ -77,7 +77,7 @@ export default function JwtLoginView() {
     <Stack spacing={2} sx={{ mb: 5 }}>
       <div>
         <Typography variant="body2" sx={{ m: 0, color: 'text.secondary' }}>
-          Powerd by NYERA
+          Powered by NYERA
         </Typography>
         <Typography variant="h4">MEGA DASHBOARD</Typography>
       </div>
