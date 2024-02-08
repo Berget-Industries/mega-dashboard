@@ -39,13 +39,15 @@ export default function JwtLoginView() {
   const password = useBoolean();
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
-    password: Yup.string().required('Password is required'),
+    email: Yup.string()
+      .required('E-postaddress kan inte vara tom.')
+      .email('Det måste vara en gilitg e-postadress.'),
+    password: Yup.string().required('Lösenord kan inte vara tomt.'),
   });
 
   const defaultValues = {
-    email: 'reservation@trattorian.se',
-    password: 'olle',
+    email: '',
+    password: '',
   };
 
   const methods = useForm({
