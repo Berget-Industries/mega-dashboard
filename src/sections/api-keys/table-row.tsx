@@ -11,9 +11,12 @@ import ListItemText from '@mui/material/ListItemText';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
+import { useAuthContext } from 'src/auth/hooks';
+
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+
 import ConfirmDialog from './confirmDialog';
 
 // eslint-disable-next-line import/no-cycle
@@ -38,6 +41,7 @@ type Props = {
 export default function APIKeysTableRow({ row, selected }: Props) {
   const { apiKeys } = row;
   const [open, setOpen] = React.useState(false);
+  const { user } = useAuthContext();
 
   const handleToggleDialog = () => {
     setOpen(!open);
@@ -55,7 +59,10 @@ export default function APIKeysTableRow({ row, selected }: Props) {
         <Avatar alt={apiKeys.organization} sx={{ mr: 2 }} />
 
         <ListItemText
-          primary={apiKeys.organization}
+          primary={
+            user?.organizations.find((org: { _id: string }) => org._id === apiKeys.organization)
+              ?.name
+          }
           primaryTypographyProps={{ typography: 'body2' }}
           secondaryTypographyProps={{
             component: 'span',
