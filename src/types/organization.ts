@@ -6,8 +6,8 @@ export interface IPlugin {
   isActivated: boolean;
 }
 export interface IOrganization {
-  plugins?: IPlugin[];
   _id?: string;
+  plugins?: IPlugin[];
   name: string;
   logoUrl?: string;
   users: Array<string>;
