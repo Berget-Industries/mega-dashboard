@@ -30,6 +30,7 @@ export const paths = {
     admin: {
       organizations: `${ROOTS.DASHBOARD}/admin/organizations`,
       users: `${ROOTS.DASHBOARD}/admin/users`,
+      systemAPIKeys: `${ROOTS.DASHBOARD}/admin/systemAPIKeys`,
     },
   },
 };
