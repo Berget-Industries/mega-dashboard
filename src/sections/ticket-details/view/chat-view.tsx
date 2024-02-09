@@ -29,7 +29,7 @@ export default function ChatView() {
 
   const settings = useSettingsContext();
 
-  const { selectedOrg } = useSelectedOrgContext();
+  const [selectedOrg] = useSelectedOrgContext();
 
   const searchParams = useSearchParams();
 

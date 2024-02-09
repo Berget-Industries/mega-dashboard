@@ -27,7 +27,7 @@ export default function OverviewBookingView() {
 
   const settings = useSettingsContext();
 
-  const { selectedOrg } = useSelectedOrgContext();
+  const [selectedOrg] = useSelectedOrgContext();
 
   const {
     conversations,

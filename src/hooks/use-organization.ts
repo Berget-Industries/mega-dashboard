@@ -1,19 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-// Assuming the organization has an id and a name, adjust types as needed
-interface Organization {
-  id: string;
-  name: string;
-}
-
-// The hook's function
 function useSelectedOrganization() {
-  // State to hold the selected organization
-  const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedOrganization, setSelectedOrganization] = useState<string | null>(null);
 
-  // Function to update the selected organization
-  const selectOrganization = (organization: Organization) => {
-    setSelectedOrganization(organization);
+  // Hook to update state when the URL changes
+  useEffect(() => {
+    const organizationId = searchParams.get('organization');
+    setSelectedOrganization(organizationId);
+  }, [searchParams]);
+
+  // Function to update the URL when the organization is selected
+  const selectOrganization = (id: string) => {
+    const newSearchParams = searchParams;
+    newSearchParams.set('organization', id);
+    setSearchParams(newSearchParams);
   };
 
   return { selectedOrganization, selectOrganization };

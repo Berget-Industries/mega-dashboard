@@ -30,7 +30,7 @@ export default function OverviewAnalyticsView() {
 
   const startDate = new Date(currentYear, currentMonth, firstDayOfCurrentMonth, 0, 0, 0);
   const endDate = new Date(currentYear, currentMonth, lastDayOfCurrentMonth, 23, 59, 59);
-  const { selectedOrg } = useSelectedOrgContext();
+  const [selectedOrg] = useSelectedOrgContext();
 
   const { messages, messagesLoading, messagesError, messagesValidating, messagesEmpty } =
     useGetOrganizationMessages({
