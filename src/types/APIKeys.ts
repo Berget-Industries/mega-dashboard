@@ -3,3 +3,12 @@ export interface IAPIKeys {
   key: string;
   organization: string;
 }
+
+export interface IAPIKeysRemove {
+  apiKeyId: string;
+}
+
+export interface IAPIKeysCreate {
+  organization: string;
+  systemKey: boolean;
+}

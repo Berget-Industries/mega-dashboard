@@ -12,6 +12,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { useBoolean } from 'src/hooks/use-boolean';
 
 import { useAuthContext } from 'src/auth/hooks';
+import { usePostRemoveAPIKeys } from 'src/api/organization';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -25,7 +26,7 @@ import ConfirmDialog from './confirmDialog';
 // ----------------------------------------------------------------------
 
 export interface IAPIKeysTableRow {
-  _id: string;
+  id: string;
   apiKeys: {
     _id: string;
     key: string;
@@ -42,6 +43,7 @@ export default function APIKeysTableRow({ row, selected }: Props) {
   const { apiKeys } = row;
   const [open, setOpen] = React.useState(false);
   const { user } = useAuthContext();
+  const { removeAPIKey } = usePostRemoveAPIKeys();
 
   const handleToggleDialog = () => {
     setOpen(!open);
@@ -119,7 +121,7 @@ export default function APIKeysTableRow({ row, selected }: Props) {
         open={open}
         handleClose={handleToggleDialog}
         apiKeys={apiKeys.organization}
-        apiKeysId={apiKeys._id}
+        apiKeysId={apiKeys.key}
       />
     </>
   );

@@ -7,6 +7,7 @@ import { IMessage } from 'src/types/message';
 // eslint-disable-next-line import/no-cycle
 import { IOrganization, IPlugin } from 'src/types/organization';
 import { IConversation } from 'src/types/conversations';
+import { IAPIKeys, IAPIKeysCreate, IAPIKeysRemove } from 'src/types/APIKeys';
 
 // ----------------------------------------------------------------------
 
@@ -225,7 +226,32 @@ export function useGetAPIKeys({ apiKeys }: { apiKeys?: string }) {
     }),
     [data, isLoading, error, isValidating]
   );
-  mutate(endpoints.admin.apiKeyList);
 
   return memoizedValue;
+}
+
+export function usePostRemoveAPIKeys() {
+  const removeAPIKey = useCallback(async (apiKey: IAPIKeysRemove) => {
+    const response = await poster(endpoints.admin.apiKeyRemove, apiKey);
+    console.log('API Nyckel togs bort:', response);
+
+    await mutate(endpoints.admin.apiKeyList);
+
+    return response;
+  }, []);
+
+  return { removeAPIKey };
+}
+
+export function usePostCreateAPIKeys() {
+  const createAPIKey = useCallback(async (apiKey: IAPIKeysCreate) => {
+    const response = await poster(endpoints.admin.apiKeyCreate, apiKey);
+    console.log('API Nyckel skapades:', response);
+
+    await mutate(endpoints.admin.apiKeyList);
+
+    return response;
+  }, []);
+
+  return { createAPIKey };
 }

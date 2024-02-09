@@ -11,6 +11,7 @@ import { Container, Stack, Typography } from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
+import { usePostCreateAPIKeys, usePostRemoveAPIKeys } from 'src/api/organization';
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 import Iconify from 'src/components/iconify';
@@ -29,9 +30,10 @@ import {
 import OrderTableFiltersResult from 'src/sections/tickets/order-table-filters-result';
 
 import { IUser } from 'src/types/user';
-import { IAPIKeys } from 'src/types/APIKeys';
 import { IOrganization } from 'src/types/organization';
+import { IAPIKeys, IAPIKeysCreate, IAPIKeysRemove } from 'src/types/APIKeys';
 import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
+
 import FilterOrganisationBar from '../users/filter-user-bar';
 import APIKeysTableRow, { IAPIKeysTableRow } from './table-row';
 
@@ -99,6 +101,24 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
   const [tableData, setTableData] = useState<IAPIKeysTableRow[]>([]);
   const [open, setOpen] = React.useState(false);
   const [selectedOrg] = useSelectedOrgContext();
+  const { createAPIKey } = usePostCreateAPIKeys();
+
+  const handleCreateAPIKey = useCallback(async () => {
+    if (selectedOrg && selectedOrg._id) {
+      const apiKeyData = {
+        organization: selectedOrg._id,
+        systemKey: false,
+      };
+      try {
+        const response = await createAPIKey(apiKeyData);
+        console.log('API-nyckel skapad:', response);
+      } catch (error) {
+        console.error('Fel vid skapande av API-nyckel:', error);
+      }
+    } else {
+      console.error('Ingen organisation vald');
+    }
+  }, [createAPIKey, selectedOrg]);
 
   useEffect(() => {
     const currentOrganizationId = selectedOrg?._id;
@@ -106,7 +126,7 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
     const formattedTableData = apiKeys
       .filter((apiKey) => apiKey.organization === currentOrganizationId)
       .map((apiKey) => ({
-        _id: apiKey._id,
+        id: apiKey._id,
         apiKeys: {
           _id: apiKey._id || '',
           key: apiKey.key || '',
@@ -148,7 +168,9 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
           API Nycklar 🔑
         </Typography>
         <Stack>
-          <Button variant="outlined">Lägg till API Nyckel</Button>
+          <Button onClick={handleCreateAPIKey} variant="outlined">
+            Lägg till API Nyckel
+          </Button>
         </Stack>
       </Stack>
       <Card>
@@ -182,9 +204,9 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
                   )
                   .map((row) => (
                     <APIKeysTableRow
-                      key={row.apiKeys.key}
+                      key={row.id}
                       row={row}
-                      selected={table.selected.includes(row.apiKeys.key)}
+                      selected={table.selected.includes(row.id)}
                     />
                   ))}
                 <TableEmptyRows

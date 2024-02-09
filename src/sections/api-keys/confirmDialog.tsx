@@ -8,6 +8,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useRemoveUsers } from 'src/api/user';
 import { IAPIKeys } from 'src/types/APIKeys';
+import { usePostRemoveAPIKeys } from 'src/api/organization';
 
 interface CreateAPIKeyDialogProps {
   open: boolean;
@@ -20,11 +21,15 @@ export default function ConfirmDialog(props: CreateAPIKeyDialogProps) {
   const { open, handleClose, apiKeys, apiKeysId } = props;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const { removeUser } = useRemoveUsers();
+  const { removeAPIKey } = usePostRemoveAPIKeys();
 
-  const handleRemove = () => {
-    removeUser(apiKeysId);
-    handleClose();
+  const handleRemoveAPIKey = async () => {
+    try {
+      await removeAPIKey({ apiKeyId: apiKeysId });
+      handleClose();
+    } catch (error) {
+      console.error('Error removing API key:', error);
+    }
   };
 
   const handleCloseDialog = () => {
@@ -41,14 +46,14 @@ export default function ConfirmDialog(props: CreateAPIKeyDialogProps) {
     >
       <DialogTitle id="responsive-dialog-title">Är du säker?</DialogTitle>
       <DialogContent>
-        <DialogContentText>Vill du ta bort {apiKeys}?</DialogContentText>
+        <DialogContentText>Vill du ta bort {apiKeysId}?</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={handleCloseDialog}>
           Avbryt
         </Button>
-        <Button onClick={handleRemove} autoFocus sx={{ color: 'error.main' }}>
-          Ta bort användare
+        <Button onClick={handleRemoveAPIKey} autoFocus sx={{ color: 'error.main' }}>
+          Ta bort nyckel
         </Button>
       </DialogActions>
     </Dialog>
