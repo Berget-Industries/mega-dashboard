@@ -10,13 +10,13 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import { alpha, useTheme } from '@mui/material/styles';
 
+import { IPlugin } from 'src/types/organization';
 import { usePlugin, useGetOrganizationPlugins } from 'src/api/organization';
 import { useSettingsContext } from 'src/components/settings';
 import { useAuthContext } from 'src/auth/hooks';
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 import FormDialog from './formDialog';
-import { IPlugin } from '../organizations/table-row';
 
 // ----------------------------------------------------------------------
 
