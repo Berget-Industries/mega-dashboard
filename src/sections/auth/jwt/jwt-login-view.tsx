@@ -39,13 +39,15 @@ export default function JwtLoginView() {
   const password = useBoolean();
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
-    password: Yup.string().required('Password is required'),
+    email: Yup.string()
+      .required('E-postaddress kan inte vara tom.')
+      .email('Det måste vara en gilitg e-postadress.'),
+    password: Yup.string().required('Lösenord kan inte vara tomt.'),
   });
 
   const defaultValues = {
-    email: 'reservation@trattorian.se',
-    password: 'olle',
+    email: '',
+    password: '',
   };
 
   const methods = useForm({
@@ -73,7 +75,15 @@ export default function JwtLoginView() {
 
   const renderHead = (
     <Stack spacing={2} sx={{ mb: 5 }}>
-      <Typography variant="h4">Logga in!</Typography>
+      <div>
+        <Typography variant="body2" sx={{ m: 0, color: 'text.secondary' }}>
+          Powered by NYERA
+        </Typography>
+        <Typography variant="h4">MEGA DASHBOARD</Typography>
+      </div>
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+        Vänligen ange inloggingsuppgifter för att forstätta.
+      </Typography>
     </Stack>
   );
 
@@ -81,11 +91,11 @@ export default function JwtLoginView() {
     <Stack spacing={2.5}>
       {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
 
-      <RHFTextField name="email" label="Email address" />
+      <RHFTextField name="email" label="E-postadress" />
 
       <RHFTextField
         name="password"
-        label="Password"
+        label="Lösenord"
         type={password.value ? 'text' : 'password'}
         InputProps={{
           endAdornment: (
@@ -99,7 +109,7 @@ export default function JwtLoginView() {
       />
 
       <Link variant="body2" color="inherit" underline="always" sx={{ alignSelf: 'flex-end' }}>
-        Forgot password?
+        Glömt lösenord?
       </Link>
 
       <LoadingButton
@@ -110,7 +120,7 @@ export default function JwtLoginView() {
         variant="contained"
         loading={isSubmitting}
       >
-        Login
+        Logga in
       </LoadingButton>
     </Stack>
   );
