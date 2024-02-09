@@ -1,9 +1,13 @@
 // eslint-disable-next-line import/no-cycle
-import { IPlugin } from 'src/sections/organizations/table-row';
-
+export interface IPlugin {
+  _id: string;
+  name: string;
+  type: string;
+  isActivated: boolean;
+}
 export interface IOrganization {
-  plugins?: IPlugin[];
   _id?: string;
+  plugins?: IPlugin[];
   name: string;
   logoUrl?: string;
   users: Array<string>;

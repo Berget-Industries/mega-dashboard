@@ -22,7 +22,7 @@ import Dashboard24hGraph from '../dashboard-24h-graph';
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const theme = useTheme();
-  const { selectedOrg } = useSelectedOrgContext();
+  const [selectedOrg] = useSelectedOrgContext();
 
   const { messages, messagesLoading, messagesError, messagesValidating, messagesEmpty } =
     useGetOrganizationMessages({

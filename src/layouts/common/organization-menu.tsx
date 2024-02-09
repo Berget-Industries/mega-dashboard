@@ -17,7 +17,7 @@ interface Organization {
 export default function OrganizationMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedItem, setSelectedItem] = React.useState<string>('Välj organisation');
-  const { selectedOrg, setSelectedOrg } = useSelectedOrgContext();
+  const [selectedOrg, setSelectedOrg] = useSelectedOrgContext();
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -26,7 +26,7 @@ export default function OrganizationMenu() {
   const handleClose = (org: any) => {
     setAnchorEl(null);
     setSelectedItem(org.name);
-    setSelectedOrg(org);
+    setSelectedOrg(org._id);
   };
 
   const handleMenuClose = () => {
@@ -40,7 +40,7 @@ export default function OrganizationMenu() {
       if (storedSelectedOrg) {
         const org: any = JSON.parse(storedSelectedOrg);
         setSelectedItem(org.name);
-        setSelectedOrg(org);
+        setSelectedOrg(org._id);
       }
     } catch (error) {
       console.error('Fel vid läsning från localStorage', error);
