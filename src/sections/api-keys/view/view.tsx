@@ -1,19 +1,17 @@
 import Container from '@mui/material/Container';
 
-import { useGetUsers } from 'src/api/user';
-import { useGetOrganizations } from 'src/api/organization';
+import { useGetAPIKeys, useGetOrganizations } from 'src/api/organization';
 
 import APIKeysTable from '../api-keys-table';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAPIKeysView() {
-  const { users, usersLoading, usersError } = useGetUsers({});
-  const { organizations, organizationsLoading, organizationsError } = useGetOrganizations({});
+  const { apiKeys } = useGetAPIKeys({});
 
   return (
     <Container maxWidth="xl">
-      <APIKeysTable users={users} organizations={organizations} />
+      <APIKeysTable apiKeys={apiKeys} />
     </Container>
   );
 }

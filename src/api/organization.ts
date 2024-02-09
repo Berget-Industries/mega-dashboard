@@ -209,3 +209,23 @@ export function usePlugin() {
 
   return { activatePlugin, deactivatePlugin };
 }
+
+export function useGetAPIKeys({ apiKeys }: { apiKeys?: string }) {
+  const URL = `${endpoints.admin.apiKeyList}`;
+  console.log('Request URL:', URL);
+
+  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+
+  const memoizedValue = useMemo(
+    () => ({
+      apiKeys: data?.apiKeys || [],
+      apiKeysLoading: isLoading,
+      apiKeysError: error,
+      apiKeysValidating: isValidating,
+    }),
+    [data, isLoading, error, isValidating]
+  );
+  mutate(endpoints.admin.apiKeyList);
+
+  return memoizedValue;
+}

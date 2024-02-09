@@ -27,26 +27,26 @@ import {
 import OrderTableFiltersResult from 'src/sections/tickets/order-table-filters-result';
 
 import { IUser } from 'src/types/user';
+import { IAPIKeys } from 'src/types/APIKeys';
 import { IOrganization } from 'src/types/organization';
 import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
 
-import CreateOrgDialog from '../users/createUserDialog';
 import FilterOrganisationBar from '../users/filter-user-bar';
-import OrderTableRow, { IUserTableRow } from '../users/table-row';
+import APIKeysTableRow, { IAPIKeysTableRow } from './table-row';
+import CreateAPIKeyDialog from './createAPIKeyDialog';
 
 // ----------------------------------------------------------------------
 
-interface UserTableProps {
-  users: IUser[];
-  organizations: IOrganization[];
+interface APIKeysTableProps {
+  apiKeys: IAPIKeys[];
 }
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'userId', label: 'ID', width: 116 },
-  { id: 'users', label: 'Användare' },
-  { id: 'company', label: 'Organisationer', width: 110 },
+  { id: 'organizationId', label: 'ID', width: 116 },
+  { id: 'organization', label: 'Organisation' },
+  { id: 'apiKeyID', label: 'Nyckel', width: 110 },
   { id: '', width: 90 },
 ];
 
@@ -64,7 +64,7 @@ function applyFilter({
   comparator,
   filters,
 }: {
-  inputData: IUserTableRow[];
+  inputData: IAPIKeysTableRow[];
   comparator: (a: any, b: any) => number;
   filters: IOrderTableFilters;
   dateError: boolean;
@@ -84,8 +84,8 @@ function applyFilter({
   if (name) {
     inputData = inputData.filter(
       (order) =>
-        order.user.id.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.user.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+        order.apiKeys._id.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
+        order.apiKeys.key.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 
@@ -94,30 +94,28 @@ function applyFilter({
 
 // ----------------------------------------------------------------------
 
-export default function APIKeysTable({ users, organizations }: UserTableProps) {
+export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
   const table = useTable({ defaultOrderBy: 'date' });
   const confirm = useBoolean();
-  const [tableData, setTableData] = useState<IUserTableRow[]>([]);
+  const [tableData, setTableData] = useState<IAPIKeysTableRow[]>([]);
   const [open, setOpen] = React.useState(false);
   const handleToggleDialog = () => {
     setOpen(!open);
   };
 
   useEffect(() => {
-    const formattedTableData = users.map((user: IUser) => ({
-      id: user.email, // Använd e-postadressen som ID om det är det du vill
-      user: {
-        id: user._id || '',
-        name: user.name || '',
-        email: user.email || '',
-        logoUrl: user.avatarUrl || '',
-        organizations: user.organizations || [],
+    const formattedTableData = apiKeys.map((apiKey: IAPIKeys) => ({
+      _id: apiKey._id,
+      apiKeys: {
+        _id: apiKey._id || '',
+        key: apiKey.key || '',
+        organization: apiKey.organization || '',
       },
     }));
 
     setTableData(formattedTableData);
-  }, [users]);
-  console.log('Här är dina användare: ', users);
+  }, [apiKeys]);
+  console.log('Här är alla api nycklar: ', apiKeys);
 
   const [filters, setFilters] = useState(defaultFilters);
   const dateError =
@@ -192,7 +190,7 @@ export default function APIKeysTable({ users, organizations }: UserTableProps) {
             onSelectAllRows={(checked) =>
               table.onSelectAllRows(
                 checked,
-                tableData.map((row) => row.id)
+                tableData.map((row) => row.apiKeys.key)
               )
             }
           />
@@ -213,10 +211,10 @@ export default function APIKeysTable({ users, organizations }: UserTableProps) {
                     table.page * table.rowsPerPage + table.rowsPerPage
                   )
                   .map((row) => (
-                    <OrderTableRow
-                      key={row.id}
+                    <APIKeysTableRow
+                      key={row.apiKeys.key}
                       row={row}
-                      selected={table.selected.includes(row.id)}
+                      selected={table.selected.includes(row.apiKeys.key)}
                     />
                   ))}
                 <TableEmptyRows
@@ -239,7 +237,11 @@ export default function APIKeysTable({ users, organizations }: UserTableProps) {
           onChangeDense={table.onChangeDense}
         />
       </Card>
-      <CreateOrgDialog open={open} handleClose={handleToggleDialog} organization={organizations} />
+      {/* <CreateAPIKeyDialog
+        open={open}
+        handleClose={handleToggleDialog}
+        organization={organizations}
+      /> */}
     </Container>
   );
 }
