@@ -7,22 +7,23 @@ import DialogContent from '@mui/material/DialogContent';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useRemoveUsers } from 'src/api/user';
+import { IAPIKeys } from 'src/types/APIKeys';
 
-interface CreateOrgDialogProps {
+interface CreateAPIKeyDialogProps {
   open: boolean;
   handleClose: () => void;
-  user: string;
-  userId: string;
+  apiKeys: string;
+  apiKeysId: string;
 }
 
-export default function ConfirmDialog(props: CreateOrgDialogProps) {
-  const { open, handleClose, user, userId } = props;
+export default function ConfirmDialog(props: CreateAPIKeyDialogProps) {
+  const { open, handleClose, apiKeys, apiKeysId } = props;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { removeUser } = useRemoveUsers();
 
   const handleRemove = () => {
-    removeUser(userId);
+    removeUser(apiKeysId);
     handleClose();
   };
 
@@ -40,7 +41,7 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
     >
       <DialogTitle id="responsive-dialog-title">Är du säker?</DialogTitle>
       <DialogContent>
-        <DialogContentText>Vill du ta bort {user}?</DialogContentText>
+        <DialogContentText>Vill du ta bort {apiKeys}?</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={handleCloseDialog}>

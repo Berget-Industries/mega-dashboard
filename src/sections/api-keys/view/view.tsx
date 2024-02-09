@@ -1,6 +1,6 @@
 import Container from '@mui/material/Container';
 
-import { useGetAPIKeys, useGetOrganizations } from 'src/api/organization';
+import { useGetAPIKeys } from 'src/api/organization';
 
 import APIKeysTable from '../api-keys-table';
 

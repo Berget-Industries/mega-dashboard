@@ -14,6 +14,7 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import ConfirmDialog from './confirmDialog';
 
 // eslint-disable-next-line import/no-cycle
 // import ConfirmDialog from './confirmDialog';
@@ -110,8 +111,8 @@ export default function APIKeysTableRow({ row, selected }: Props) {
       <ConfirmDialog
         open={open}
         handleClose={handleToggleDialog}
-        user={user.name}
-        userId={user.id}
+        apiKeys={apiKeys.organization}
+        apiKeysId={apiKeys._id}
       />
     </>
   );

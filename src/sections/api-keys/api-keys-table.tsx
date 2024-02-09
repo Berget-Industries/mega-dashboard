@@ -11,6 +11,8 @@ import { Container, Stack, Typography } from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
+
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import {
@@ -31,9 +33,9 @@ import { IAPIKeys } from 'src/types/APIKeys';
 import { IOrganization } from 'src/types/organization';
 import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
 
+import CreateAPIKeyDialog from './createAPIKeyDialog';
 import FilterOrganisationBar from '../users/filter-user-bar';
 import APIKeysTableRow, { IAPIKeysTableRow } from './table-row';
-import CreateAPIKeyDialog from './createAPIKeyDialog';
 
 // ----------------------------------------------------------------------
 
@@ -99,23 +101,33 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
   const confirm = useBoolean();
   const [tableData, setTableData] = useState<IAPIKeysTableRow[]>([]);
   const [open, setOpen] = React.useState(false);
+  const [selectedOrg] = useSelectedOrgContext();
   const handleToggleDialog = () => {
     setOpen(!open);
   };
 
   useEffect(() => {
-    const formattedTableData = apiKeys.map((apiKey: IAPIKeys) => ({
-      _id: apiKey._id,
-      apiKeys: {
-        _id: apiKey._id || '',
-        key: apiKey.key || '',
-        organization: apiKey.organization || '',
-      },
-    }));
+    // Använd `selectedOrg` för att få ID:t för den valda organisationen.
+    // Här antar jag att `selectedOrg` har en egenskap som heter `id` som representerar organisationens ID.
+    // Du kanske behöver justera detta beroende på hur din `selectedOrg`-objektstruktur ser ut.
+    const currentOrganizationId = selectedOrg?._id;
+
+    const formattedTableData = apiKeys
+      .filter((apiKey) => apiKey.organization === currentOrganizationId) // Filtrera baserat på den valda organisationen
+      .map((apiKey) => ({
+        _id: apiKey._id,
+        apiKeys: {
+          _id: apiKey._id || '',
+          key: apiKey.key || '',
+          organization: apiKey.organization || '',
+        },
+      }));
 
     setTableData(formattedTableData);
-  }, [apiKeys]);
+  }, [apiKeys, selectedOrg]); // Lägg till `selectedOrg` som en beroende för att reagera på dess förändringar
+
   console.log('Här är alla api nycklar: ', apiKeys);
+  console.log('här är org id', selectedOrg?._id);
 
   const [filters, setFilters] = useState(defaultFilters);
   const dateError =
@@ -165,7 +177,7 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
         </Stack>
       </Stack>
       <Card>
-        <FilterOrganisationBar
+        {/* <FilterOrganisationBar
           filters={filters}
           onFilters={handleFilters}
           canReset={canReset}
@@ -181,7 +193,7 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
             results={dataFiltered.length}
             sx={{ p: 2.5, pt: 0 }}
           />
-        )}
+        )} */}
         <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
           <TableSelectedAction
             dense={table.dense}
