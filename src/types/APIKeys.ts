@@ -2,6 +2,7 @@ export interface IAPIKeys {
   _id: string;
   key: string;
   organization: string;
+  systemKey: boolean;
 }
 
 export interface IAPIKeysRemove {
@@ -10,5 +11,10 @@ export interface IAPIKeysRemove {
 
 export interface IAPIKeysCreate {
   organization: string;
+  systemKey: boolean;
+}
+
+export interface ISystemAPIKeysCreate {
+  organization: string[];
   systemKey: boolean;
 }

@@ -1,6 +1,11 @@
 import Container from '@mui/material/Container';
 
-import { useGetAPIKeys, usePostCreateAPIKeys, usePostRemoveAPIKeys } from 'src/api/organization';
+import {
+  useGetAPIKeys,
+  useGetOrganizations,
+  usePostCreateAPIKeys,
+  usePostRemoveAPIKeys,
+} from 'src/api/organization';
 
 import SystemAPIKeysTable from '../system-api-keys-table';
 
@@ -8,10 +13,11 @@ import SystemAPIKeysTable from '../system-api-keys-table';
 
 export default function OverviewSystemAPIKeysView() {
   const { apiKeys } = useGetAPIKeys({});
+  const { organizations } = useGetOrganizations({});
 
   return (
     <Container maxWidth="xl">
-      <SystemAPIKeysTable apiKeys={apiKeys} />
+      <SystemAPIKeysTable apiKeys={apiKeys} organizations={organizations} />
     </Container>
   );
 }

@@ -31,6 +31,7 @@ export interface ISystemAPIKeysTableRow {
     _id: string;
     key: string;
     organization: string;
+    systemKey: boolean;
   };
 }
 

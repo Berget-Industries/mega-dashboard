@@ -36,11 +36,13 @@ import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
 
 import FilterOrganisationBar from '../users/filter-user-bar';
 import APIKeysTableRow, { ISystemAPIKeysTableRow } from './table-row';
+import CreateSystemAPIKeyDialog from './createSystemAPIKeyDialog';
 
 // ----------------------------------------------------------------------
 
 interface SystemAPIKeysTableProps {
   apiKeys: IAPIKeys[];
+  organizations: IOrganization[];
 }
 
 // ----------------------------------------------------------------------
@@ -96,49 +98,31 @@ function applyFilter({
 
 // ----------------------------------------------------------------------
 
-export default function SystemAPIKeysTable({ apiKeys }: SystemAPIKeysTableProps) {
+export default function SystemAPIKeysTable({ apiKeys, organizations }: SystemAPIKeysTableProps) {
   const table = useTable({ defaultOrderBy: 'date' });
   const [tableData, setTableData] = useState<ISystemAPIKeysTableRow[]>([]);
   const [open, setOpen] = React.useState(false);
-  const [selectedOrg] = useSelectedOrgContext();
-  const { createAPIKey } = usePostCreateAPIKeys();
-
-  const handleCreateAPIKey = useCallback(async () => {
-    if (selectedOrg && selectedOrg._id) {
-      const apiKeyData = {
-        organization: selectedOrg._id,
-        systemKey: false,
-      };
-      try {
-        const response = await createAPIKey(apiKeyData);
-        console.log('API-nyckel skapad:', response);
-      } catch (error) {
-        console.error('Fel vid skapande av API-nyckel:', error);
-      }
-    } else {
-      console.error('Ingen organisation vald');
-    }
-  }, [createAPIKey, selectedOrg]);
+  const handleToggleDialog = () => {
+    setOpen(!open);
+  };
 
   useEffect(() => {
-    const currentOrganizationId = selectedOrg?._id;
-
     const formattedTableData = apiKeys
-      .filter((apiKey) => apiKey.organization === currentOrganizationId)
+      .filter((apiKey) => apiKey.systemKey === true) // Filtrera för att endast inkludera de med systemKey === true
       .map((apiKey) => ({
         id: apiKey._id,
         apiKeys: {
           _id: apiKey._id || '',
           key: apiKey.key || '',
           organization: apiKey.organization || '',
+          systemKey: apiKey.systemKey || true, // Detta kommer alltid att vara true här p.g.a. filtervillkoret
         },
       }));
 
     setTableData(formattedTableData);
-  }, [apiKeys, selectedOrg]);
+  }, [apiKeys]);
 
   console.log('Här är alla api nycklar: ', apiKeys);
-  console.log('här är org id', selectedOrg?._id);
 
   const [filters, setFilters] = useState(defaultFilters);
   const dateError =
@@ -156,6 +140,21 @@ export default function SystemAPIKeysTable({ apiKeys }: SystemAPIKeysTableProps)
     !!filters.name || filters.status !== 'all' || (!!filters.startDate && !!filters.endDate);
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
+  const handleFilters = useCallback(
+    (name: string, value: IOrderTableFilterValue) => {
+      table.onResetPage();
+      setFilters((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    },
+    [table]
+  );
+
+  const handleResetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+  }, []);
+
   return (
     <Container maxWidth="xl">
       <Stack direction="row" justifyContent="space-between">
@@ -168,12 +167,23 @@ export default function SystemAPIKeysTable({ apiKeys }: SystemAPIKeysTableProps)
           System API Nycklar 🔑
         </Typography>
         <Stack>
-          <Button onClick={handleCreateAPIKey} variant="outlined">
+          <Button
+            onClick={() => {
+              handleToggleDialog();
+            }}
+            variant="outlined"
+          >
             Lägg till API Nyckel
           </Button>
         </Stack>
       </Stack>
       <Card>
+        <FilterOrganisationBar
+          filters={filters}
+          onFilters={handleFilters}
+          canReset={canReset}
+          onResetFilters={handleResetFilters}
+        />
         <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
           <TableSelectedAction
             dense={table.dense}
@@ -229,6 +239,11 @@ export default function SystemAPIKeysTable({ apiKeys }: SystemAPIKeysTableProps)
           onChangeDense={table.onChangeDense}
         />
       </Card>
+      <CreateSystemAPIKeyDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        organization={organizations}
+      />
     </Container>
   );
 }
