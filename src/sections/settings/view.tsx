@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import { alpha, useTheme } from '@mui/material/styles';
+import { Stack } from '@mui/system';
 
 import { IPlugin } from 'src/types/organization';
 import { usePlugin, useGetOrganizationPlugins } from 'src/api/organization';
@@ -17,6 +18,7 @@ import { useAuthContext } from 'src/auth/hooks';
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 import FormDialog from './formDialog';
+import NewPluginFrom from './newPluginForm';
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +36,9 @@ export default function OverviewAnalyticsView() {
   const [actionTypesInput, setActionTypesInput] = useState<IPlugin[]>([]);
   const [actionTypesChain, setActionTypesChain] = useState<IPlugin[]>([]);
   const [actionTypesTool, setActionTypesTool] = useState<IPlugin[]>([]);
+
   const [openPluginConfigId, setOpenPluginConfigId] = React.useState<string | null>(null);
+  const [newPluginOpen, setNewPluginOpen] = React.useState<boolean>(false);
 
   useEffect(() => {
     const typeInput = allPlugins.filter((_) => _.type === 'input');
@@ -64,14 +68,19 @@ export default function OverviewAnalyticsView() {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      <Typography
-        variant="h4"
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
         sx={{
           mb: { xs: 3, md: 5 },
         }}
       >
-        Anpassning 🚀 ⚙️
-      </Typography>
+        <Typography variant="h4">Anpassning 🚀 ⚙️</Typography>
+        <Button variant="outlined" onClick={() => setNewPluginOpen(true)}>
+          Lägg till plugin
+        </Button>
+      </Stack>
 
       {[actionTypesInput, actionTypesChain, actionTypesTool].map((_plugins) => (
         <Grid
@@ -116,6 +125,7 @@ export default function OverviewAnalyticsView() {
         plugin={plugins.find((_) => _._id === openPluginConfigId)}
         onClose={() => setOpenPluginConfigId(null)}
       />
+      <NewPluginFrom open={newPluginOpen} onClose={() => setNewPluginOpen(false)} />
     </Container>
   );
 }
