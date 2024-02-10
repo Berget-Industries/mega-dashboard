@@ -4,6 +4,8 @@ export interface IPlugin {
   name: string;
   type: string;
   isActivated: boolean;
+  config: Record<string, any>;
+  organization: string;
 }
 export interface IOrganization {
   _id?: string;
