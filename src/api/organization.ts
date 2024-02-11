@@ -255,7 +255,9 @@ export function useGetAPIKeys({ apiKeys }: { apiKeys?: string }) {
 
 export function usePostRemoveAPIKeys() {
   const removeAPIKey = useCallback(async (apiKey: IAPIKeysRemove) => {
-    const response = await poster(endpoints.admin.apiKeyRemove, apiKey);
+    const response = await poster(endpoints.admin.apiKeyRemove, {
+      apiKeyId: apiKey.apiKeyId,
+    });
     console.log('API Nyckel togs bort:', response);
 
     await mutate(endpoints.admin.apiKeyList);

@@ -122,7 +122,7 @@ export default function APIKeysTableRow({ row, selected }: Props) {
         open={open}
         handleClose={handleToggleDialog}
         apiKeys={apiKeys.organization}
-        apiKeysId={apiKeys.key}
+        apiKeysId={apiKeys._id}
       />
     </>
   );

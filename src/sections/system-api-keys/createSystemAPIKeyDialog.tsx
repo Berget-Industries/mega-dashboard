@@ -31,14 +31,13 @@ export default function CreateSystemAPIKeyDialog({
   organization,
 }: CreateOrgDialogProps) {
   const [organizations, setOrganizations] = useState<string>('');
-  const [systemKey, setSystemKey] = useState(true);
 
   const { createAPIKey } = usePostCreateAPIKeys();
 
   const handleCreateSystemAPIKey = async () => {
     const data = {
       organization: organizations,
-      systemKey,
+      systemKey: true,
     };
 
     try {
@@ -57,7 +56,6 @@ export default function CreateSystemAPIKeyDialog({
 
   const resetForm = () => {
     setOrganizations('');
-    setSystemKey(false);
   };
 
   return (
