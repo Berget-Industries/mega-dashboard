@@ -56,10 +56,12 @@ export function useNavData() {
     ];
     if (user?.systemAdmin) {
       items.push({ title: 'Anpassning', path: paths.dashboard.settings, icon: ICONS.lock });
+      items.push({ title: 'API Nycklar', path: paths.dashboard.apiKeys, icon: ICONS.lock });
     }
     const adminItems = [
       { title: 'Organisationer', path: paths.dashboard.admin.organizations, icon: ICONS.banking },
       { title: 'Användare', path: paths.dashboard.admin.users, icon: ICONS.user },
+      { title: 'System API Nycklar', path: paths.dashboard.admin.systemAPIKeys, icon: ICONS.lock },
     ];
 
     const sections = [

@@ -12,6 +12,8 @@ import path from 'path';
 const IndexPage = lazy(() => import('src/pages/dashboard/index'));
 const Analytics = lazy(() => import('src/pages/dashboard/analytics'));
 const Settings = lazy(() => import('src/pages/dashboard/settings'));
+const APIKeys = lazy(() => import('src/pages/dashboard/api-keys'));
+const SystemAPIKeys = lazy(() => import('src/pages/dashboard/admin/systemAPIKeys'));
 const Organizations = lazy(() => import('src/pages/dashboard/admin/organizations'));
 const Users = lazy(() => import('src/pages/dashboard/admin/users'));
 const Tickets = lazy(() => import('src/pages/dashboard/tickets'));
@@ -43,6 +45,14 @@ export const dashboardRoutes = [
         path: 'settings',
       },
       {
+        element: (
+          <RoleBasedGuard>
+            <APIKeys />
+          </RoleBasedGuard>
+        ),
+        path: 'api-keys',
+      },
+      {
         path: 'admin',
         element: (
           <RoleBasedGuard>
@@ -57,6 +67,10 @@ export const dashboardRoutes = [
           {
             element: <Users />,
             path: 'users',
+          },
+          {
+            element: <SystemAPIKeys />,
+            path: 'systemAPIKeys',
           },
         ],
       },

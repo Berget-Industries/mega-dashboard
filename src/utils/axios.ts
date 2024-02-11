@@ -58,9 +58,9 @@ export const endpoints = {
     userList: '/api/admin/user/list',
     userCreate: '/api/admin/user/create',
     userRemove: '/api/admin/user/remove',
-    apiKeyList: '/api/admin/api-key/list',
-    apiKeyCreate: '/api/admin/api-key/create',
-    apiKeyRemove: '/api/admin/api-key/remove',
+    apiKeyList: '/api/admin/apikey/list',
+    apiKeyCreate: '/api/admin/apikey/create',
+    apiKeyRemove: '/api/admin/apikey/remove',
     plugin: {
       add: '/api/admin/plugin/add',
       list: '/api/admin/plugin/list',
