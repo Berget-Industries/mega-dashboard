@@ -208,7 +208,30 @@ export function usePlugin() {
     []
   );
 
-  return { activatePlugin, deactivatePlugin };
+  const updatePluginConfig = useCallback(
+    async ({
+      organizationId,
+      name,
+      config,
+    }: {
+      organizationId: string;
+      name: string;
+      config: any;
+    }) => {
+      const response = await poster(endpoints.admin.plugin.update, {
+        organizationId,
+        config,
+        name,
+      });
+
+      await mutate(endpoints.admin.organizationList);
+
+      return response;
+    },
+    []
+  );
+
+  return { activatePlugin, deactivatePlugin, updatePluginConfig };
 }
 
 export function useGetAPIKeys({ apiKeys }: { apiKeys?: string }) {

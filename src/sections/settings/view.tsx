@@ -34,7 +34,7 @@ export default function OverviewAnalyticsView() {
   const [actionTypesInput, setActionTypesInput] = useState<IPlugin[]>([]);
   const [actionTypesChain, setActionTypesChain] = useState<IPlugin[]>([]);
   const [actionTypesTool, setActionTypesTool] = useState<IPlugin[]>([]);
-  const [open, setOpen] = React.useState(false);
+  const [openPluginConfigId, setOpenPluginConfigId] = React.useState<string | null>(null);
 
   useEffect(() => {
     const typeInput = allPlugins.filter((_) => _.type === 'input');
@@ -97,7 +97,7 @@ export default function OverviewAnalyticsView() {
                   </Typography>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'space-between', padding: 3 }}>
-                  <Button onClick={() => setOpen(true)} variant="outlined">
+                  <Button onClick={() => setOpenPluginConfigId(plugin._id)} variant="outlined">
                     Ändra konfig
                   </Button>
                   <Switch
@@ -112,7 +112,10 @@ export default function OverviewAnalyticsView() {
           ))}
         </Grid>
       ))}
-      <FormDialog open={open} setOpen={setOpen} />
+      <FormDialog
+        plugin={plugins.find((_) => _._id === openPluginConfigId)}
+        onClose={() => setOpenPluginConfigId(null)}
+      />
     </Container>
   );
 }
