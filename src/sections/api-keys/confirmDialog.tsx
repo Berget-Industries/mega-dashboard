@@ -25,6 +25,8 @@ export default function ConfirmDialog(props: CreateAPIKeyDialogProps) {
 
   const handleRemoveAPIKey = async () => {
     try {
+      console.log(apiKeysId);
+      console.log(apiKeys);
       await removeAPIKey({ apiKeyId: apiKeysId });
       handleClose();
     } catch (error) {
