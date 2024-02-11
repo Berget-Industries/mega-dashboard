@@ -61,6 +61,7 @@ export function useNavData() {
     const adminItems = [
       { title: 'Organisationer', path: paths.dashboard.admin.organizations, icon: ICONS.banking },
       { title: 'Användare', path: paths.dashboard.admin.users, icon: ICONS.user },
+      { title: 'System API Nycklar', path: paths.dashboard.admin.systemAPIKeys, icon: ICONS.lock },
     ];
 
     const sections = [
