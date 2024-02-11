@@ -216,7 +216,7 @@ export function usePlugin() {
     }: {
       organizationId: string;
       name: string;
-      config: any;
+      config: Record<string, any>;
     }) => {
       const response = await poster(endpoints.admin.plugin.update, {
         organizationId,
@@ -231,7 +231,42 @@ export function usePlugin() {
     []
   );
 
-  return { activatePlugin, deactivatePlugin, updatePluginConfig };
+  const getAvailablePlugins = useCallback(async () => {
+    const response = await fetcher(endpoints.admin.plugin.available);
+
+    return response;
+  }, []);
+
+  const createNewPlugin = useCallback(
+    async ({
+      organizationId,
+      name,
+      config,
+    }: {
+      organizationId: string;
+      name: string;
+      config: any;
+    }) => {
+      const response = await poster(endpoints.admin.plugin.add, {
+        organizationId,
+        name,
+        config,
+      });
+
+      await mutate(endpoints.admin.plugin.list);
+
+      return response;
+    },
+    []
+  );
+
+  return {
+    activatePlugin,
+    deactivatePlugin,
+    updatePluginConfig,
+    getAvailablePlugins,
+    createNewPlugin,
+  };
 }
 
 export function useGetAPIKeys({ apiKeys }: { apiKeys?: string }) {
