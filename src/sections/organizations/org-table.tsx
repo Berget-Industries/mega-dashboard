@@ -26,17 +26,19 @@ import {
 
 import OrderTableFiltersResult from 'src/sections/tickets/order-table-filters-result';
 
+import { IUser } from 'src/types/user';
 import { IOrganization } from 'src/types/organization';
 import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
 
-import OrderTableRow, { IOrganizationTableRow } from './table-row';
 import CreateOrgDialog from './createOrgDialog';
 import FilterOrganisationBar from './filter-org-bar';
+import OrderTableRow, { IOrganizationTableRow } from './table-row';
 
 // ----------------------------------------------------------------------
 
 interface OrganizationTableProps {
   organizations: IOrganization[];
+  users: IUser[];
 }
 
 // ----------------------------------------------------------------------
@@ -93,7 +95,7 @@ function applyFilter({
 
 // ----------------------------------------------------------------------
 
-export default function OrganizationTable({ organizations }: OrganizationTableProps) {
+export default function OrganizationTable({ organizations, users }: OrganizationTableProps) {
   const table = useTable({ defaultOrderBy: 'date' });
   const confirm = useBoolean();
   const [tableData, setTableData] = useState<IOrganizationTableRow[]>([]);
@@ -223,6 +225,7 @@ export default function OrganizationTable({ organizations }: OrganizationTablePr
                       key={row.id}
                       row={row}
                       selected={table.selected.includes(row.id)}
+                      users={users}
                     />
                   ))}
                 <TableEmptyRows

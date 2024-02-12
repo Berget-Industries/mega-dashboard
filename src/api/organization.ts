@@ -8,6 +8,7 @@ import { IMessage } from 'src/types/message';
 import { IOrganization, IPlugin } from 'src/types/organization';
 import { IConversation } from 'src/types/conversations';
 import { IAPIKeys, IAPIKeysCreate, IAPIKeysRemove } from 'src/types/APIKeys';
+import { IUser } from 'src/types/user';
 
 // ----------------------------------------------------------------------
 
@@ -332,4 +333,36 @@ export function usePostCreateAPIKeys() {
   }, []);
 
   return { createAPIKey };
+}
+
+export function usePostAddUserToOrganization() {
+  const addUser = useCallback(async (userId: string, organizationId: string) => {
+    const response = await poster(endpoints.admin.addUserToOrganization, {
+      userId,
+      organizationId,
+    });
+
+    await mutate(endpoints.admin.organizationList);
+    await mutate(endpoints.admin.userList);
+
+    return response;
+  }, []);
+
+  return { addUser };
+}
+
+export function usePostRemoveUserFromOrganization() {
+  const removeUser = useCallback(async (userId: string, organizationId: string) => {
+    const response = await poster(endpoints.admin.removeUserFromOrganization, {
+      userId,
+      organizationId,
+    });
+
+    await mutate(endpoints.admin.organizationList);
+    await mutate(endpoints.admin.userList);
+
+    return response;
+  }, []);
+
+  return { removeUser };
 }

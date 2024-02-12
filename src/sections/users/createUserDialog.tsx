@@ -15,6 +15,7 @@ import {
 import { usePostUsers } from 'src/api/user';
 import { useGetOrganizations } from 'src/api/organization';
 import { IOrganization } from 'src/types/organization';
+import { id } from 'date-fns/locale';
 
 interface CreateOrgDialogProps {
   open: boolean;
@@ -40,6 +41,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
 
   const handleCreateUser = async () => {
     const userData = {
+      _id: '',
       name: userName,
       email,
       avatarUrl: logoUrl || '',
