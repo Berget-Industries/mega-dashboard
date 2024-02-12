@@ -96,15 +96,19 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
   };
 
   const renderValue = (selectedOrgIds: string[]) => {
-    const selectedOrgNames = selectedOrgIds
-      .map((orgId) => {
-        const org = organization.find((orgs) => orgs._id === orgId);
-        return org ? org.name : null;
-      })
-      .filter((name) => name !== null)
-      .join(', ');
+    if (selectedOrgIds.length > 1) {
+      const firstOrgName =
+        organization.find((org) => org._id === selectedOrgIds[0])?.name || 'Okänd organisation';
 
-    return selectedOrgNames || 'Välj organisation';
+      return `${firstOrgName}, ...`;
+    }
+    if (selectedOrg.length === 1) {
+      const orgName =
+        organization.find((org) => org._id === selectedOrg[0])?.name || 'Okänd organisation';
+      return orgName;
+    }
+
+    return 'Välj organisation';
   };
 
   const handleOrgClick = async (orgId: string) => {
@@ -154,8 +158,14 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
             renderValue={() => renderValue(selectedOrg)}
             IconComponent={ArrowDropDownIcon}
             sx={{
-              maxHeight: '40px',
-              '.MuiSelect-select': { py: '10px', display: 'flex', alignItems: 'center' },
+              maxWidth: '200px',
+              '.MuiSelect-select': {
+                py: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              },
             }}
             MenuProps={{
               PaperProps: {
@@ -176,17 +186,18 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
                 sx={{
                   '.MuiInputBase-root': {
                     height: '40px',
-                    width: '100%', // Justera höjden här
+                    width: '100%',
+                    marginTop: '4px',
                   },
                   '.MuiOutlinedInput-input': {
-                    padding: '10px 14px', // Minska padding för att minska höjd
-                    fontSize: '0.875rem', // Anpassa textstorlek om nödvändigt
+                    padding: '10px 14px',
+                    fontSize: '0.875rem',
                   },
                   '.MuiInputLabel-root': {
-                    transform: 'translate(14px, 12px) scale(1)', // Justera label position vid behov
+                    transform: 'translate(14px, 12px) scale(1)',
                   },
                   '.MuiInputLabel-shrink': {
-                    transform: 'translate(14px, -6px) scale(0.75)', // Justera förminskad label position
+                    transform: 'translate(14px, -6px) scale(0.75)',
                   },
                 }}
               />
