@@ -387,6 +387,20 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 setPluginConfig({ ...pluginConfig, imapFrom: event.target.value });
               }}
             />
+
+            <TextField
+              id="_megaApiKey"
+              label="MEGA API KEY"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.apiKey}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({ ...pluginConfig, apiKey: event.target.value });
+              }}
+            />
           </>
         )}
 
@@ -397,7 +411,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
             OBS
           */}
 
-        {plugin.name === 'waiteraid' && (
+        {plugin.name === 'mega-assistant-alex-waiteraid' && (
           <>
             <Stack spacing={2} justifyContent="space-between" alignItems="center" direction="row">
               <Typography sx={{ p: 1 }} variant="h6" color="text.secondary">
@@ -431,9 +445,17 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setFullScreen(!fullScreen)}>Fullscreen</Button>
-        <Button onClick={onClose}>Avbryt</Button>
-        <Button type="submit">Ändra</Button>
+        <span style={{ flexGrow: 1 }}>
+          <Button variant="outlined" onClick={onClose}>
+            Avbryt
+          </Button>
+        </span>
+        <Button variant="outlined" onClick={() => setFullScreen(!fullScreen)}>
+          Fullscreen
+        </Button>
+        <Button type="submit" variant="contained" color="primary">
+          Spara
+        </Button>
       </DialogActions>
     </Dialog>
   );

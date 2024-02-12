@@ -19,6 +19,7 @@ import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-conte
 
 import FormDialog from './formDialog';
 import NewPluginFrom from './newPluginForm';
+import ConfirmDialog from './confirmDialog';
 
 // ----------------------------------------------------------------------
 
@@ -28,6 +29,7 @@ export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const theme = useTheme();
 
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const { plugins, pluginsLoading, pluginsError, pluginsValidating } = useGetOrganizationPlugins({
     organizationId: selectedOrg?._id,
   });
@@ -140,12 +142,7 @@ export default function OverviewAnalyticsView() {
                   >
                     <SettingsIcon />
                   </IconButton>
-                  <IconButton
-                    onClick={() =>
-                      removePlugin({ pluginId: plugin._id, organizationId: selectedOrg?._id || '' })
-                    }
-                    aria-label="delete"
-                  >
+                  <IconButton onClick={() => setConfirmDelete(plugin._id)} aria-label="delete">
                     <DeleteIcon />
                   </IconButton>
                 </>
@@ -154,6 +151,16 @@ export default function OverviewAnalyticsView() {
           ))}
         </Container>
       ))}
+      <ConfirmDialog
+        open={Boolean(confirmDelete)}
+        onClose={() => setConfirmDelete(null)}
+        onSuccess={() => {
+          if (confirmDelete && selectedOrg?._id) {
+            removePlugin({ pluginId: confirmDelete, organizationId: selectedOrg._id });
+            setConfirmDelete(null);
+          }
+        }}
+      />
       <FormDialog
         plugin={plugins.find((_) => _._id === openPluginConfigId)}
         onClose={() => setOpenPluginConfigId(null)}
