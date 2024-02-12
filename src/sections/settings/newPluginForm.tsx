@@ -44,6 +44,8 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
   const [selectedOrg] = useSelectedOrgContext();
   const { getAvailablePlugins, createNewPlugin } = usePlugin();
   const [fullScreen, setFullScreen] = React.useState(false);
+
+  const [installedPlugins, setInstalledPlugins] = React.useState<IPlugin[]>([]);
   const [pluginConfig, setPluginConfig] = React.useState<Record<string, any>>({});
   const [defaultPlugin, setDefaultPlugin] = React.useState<availablePlugin | null>(null);
   const [availablePlugins, setAvailablePlugins] = React.useState<availablePlugin[]>([]);
@@ -51,10 +53,13 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
   const [newPlugin, setNewPlugin] = React.useState<newPlugin | null>(null);
 
   React.useEffect(() => {
-    getAvailablePlugins().then((data) => {
+    if (!selectedOrg?._id) return;
+    getAvailablePlugins({ organizationId: selectedOrg._id }).then((data) => {
+      console.log(data);
       setAvailablePlugins(data.availablePlugins);
+      // setInstalledPlugins(data.installed);
     });
-  }, [getAvailablePlugins]);
+  }, [getAvailablePlugins, selectedOrg]);
 
   React.useEffect(() => {
     if (defaultPlugin && selectedOrg?._id) {

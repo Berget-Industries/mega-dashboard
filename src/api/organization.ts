@@ -180,14 +180,16 @@ export function usePostDeactivatePlugins() {
 }
 
 export function usePlugin() {
+  const mutationKey = (organizationId: string) =>
+    `${endpoints.admin.plugin.list}${organizationId ? `?organizationId=${organizationId}` : ''}`;
+
   const activatePlugin = useCallback(
-    async ({ organizationId, name }: { organizationId: string; name: string }) => {
+    async ({ pluginId, organizationId }: { pluginId: string; organizationId: string }) => {
       const response = await poster(endpoints.admin.plugin.activate, {
-        organizationId,
-        name,
+        pluginId,
       });
 
-      await mutate(endpoints.admin.organizationList);
+      await mutate(mutationKey(organizationId));
 
       return response;
     },
@@ -195,13 +197,12 @@ export function usePlugin() {
   );
 
   const deactivatePlugin = useCallback(
-    async ({ organizationId, name }: { organizationId: string; name: string }) => {
+    async ({ pluginId, organizationId }: { pluginId: string; organizationId: string }) => {
       const response = await poster(endpoints.admin.plugin.deactivate, {
-        organizationId,
-        name,
+        pluginId,
       });
 
-      await mutate(endpoints.admin.organizationList);
+      await mutate(mutationKey(organizationId));
 
       return response;
     },
@@ -210,32 +211,35 @@ export function usePlugin() {
 
   const updatePluginConfig = useCallback(
     async ({
+      pluginId,
       organizationId,
-      name,
       config,
     }: {
+      pluginId: string;
       organizationId: string;
-      name: string;
       config: Record<string, any>;
     }) => {
       const response = await poster(endpoints.admin.plugin.update, {
-        organizationId,
+        pluginId,
         config,
-        name,
       });
 
-      await mutate(endpoints.admin.organizationList);
+      await mutate(mutationKey(organizationId));
 
       return response;
     },
     []
   );
 
-  const getAvailablePlugins = useCallback(async () => {
-    const response = await fetcher(endpoints.admin.plugin.available);
-
-    return response;
-  }, []);
+  const getAvailablePlugins = useCallback(
+    async ({ organizationId }: { organizationId: string }) => {
+      const response = await fetcher(
+        `${endpoints.admin.plugin.available}?organizationId=${organizationId}`
+      );
+      return response;
+    },
+    []
+  );
 
   const createNewPlugin = useCallback(
     async ({
@@ -245,7 +249,7 @@ export function usePlugin() {
     }: {
       organizationId: string;
       name: string;
-      config: any;
+      config: Record<string, any>;
     }) => {
       const response = await poster(endpoints.admin.plugin.add, {
         organizationId,
@@ -253,7 +257,20 @@ export function usePlugin() {
         config,
       });
 
-      await mutate(endpoints.admin.plugin.list);
+      await mutate(mutationKey(organizationId));
+
+      return response;
+    },
+    []
+  );
+
+  const removePlugin = useCallback(
+    async ({ pluginId, organizationId }: { pluginId: string; organizationId: string }) => {
+      const response = await poster(endpoints.admin.plugin.remove, {
+        pluginId,
+      });
+
+      await mutate(mutationKey(organizationId));
 
       return response;
     },
@@ -266,6 +283,7 @@ export function usePlugin() {
     updatePluginConfig,
     getAvailablePlugins,
     createNewPlugin,
+    removePlugin,
   };
 }
 

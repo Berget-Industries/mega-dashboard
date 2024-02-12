@@ -10,6 +10,7 @@ import { IPlugin } from 'src/types/organization';
 import { Container, Stack } from '@mui/system';
 import { Typography, Switch, Grid } from '@mui/material';
 import { usePlugin } from 'src/api/organization';
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 interface FormDialogProps {
   plugin: IPlugin | undefined;
@@ -17,6 +18,7 @@ interface FormDialogProps {
 }
 
 export default function FormDialog({ plugin, onClose }: FormDialogProps) {
+  const [selectedOrg] = useSelectedOrgContext();
   const { updatePluginConfig } = usePlugin();
   const [fullScreen, setFullScreen] = React.useState(false);
   const [pluginConfig, setPluginConfig] = React.useState<Record<string, any>>({});
@@ -47,9 +49,9 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
           updatePluginConfig({
-            organizationId: plugin.organization,
             config: pluginConfig,
-            name: plugin.name,
+            pluginId: plugin._id,
+            organizationId: selectedOrg?._id || '',
           });
           onClose();
         },
