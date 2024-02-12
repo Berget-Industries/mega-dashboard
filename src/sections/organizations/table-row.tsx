@@ -118,9 +118,13 @@ export default function OrderTableRow({ row, selected, users }: Props) {
             displayEmpty
             value={selectedUsers}
             onChange={handleSelectUser}
-            renderValue={(selectedd) =>
-              selectedd.length > 0 ? selectedd.join(', ') : 'Inga användare'
-            }
+            renderValue={(selectedd) => {
+              if (selectedd.length === 0) {
+                return <p>Välj en användare</p>;
+              }
+              // Visa första användarens namn följt av "..." om fler än en användare är vald
+              return `${selectedd[0]}${selectedd.length > 1 ? '...' : ''}`;
+            }}
             IconComponent={ArrowDropDownIcon}
             MenuProps={{
               PaperProps: {
