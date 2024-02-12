@@ -323,7 +323,6 @@ export function usePostAddUserToOrganization() {
       userId,
       organizationId,
     });
-    console.log('API Nyckel togs bort:', response);
 
     await mutate(endpoints.admin.organizationList);
     await mutate(endpoints.admin.userList);
@@ -340,7 +339,6 @@ export function usePostRemoveUserFromOrganization() {
       userId,
       organizationId,
     });
-    console.log('API Nyckel togs bort:', response);
 
     await mutate(endpoints.admin.organizationList);
     await mutate(endpoints.admin.userList);
