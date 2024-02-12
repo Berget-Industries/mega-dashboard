@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
 import { format } from 'date-fns';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
@@ -20,13 +20,17 @@ import {
 } from '@mui/material';
 
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
+import {
+  usePostAddUserToOrganization,
+  usePostRemoveUserFromOrganization,
+} from 'src/api/organization';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
 import { IUser } from 'src/types/user';
-import { IPlugin } from 'src/types/organization';
+import { IOrganization, IPlugin } from 'src/types/organization';
 
 // eslint-disable-next-line import/no-cycle
 import ConfirmDialog from './confirmDialog';
@@ -54,10 +58,26 @@ export default function OrderTableRow({ row, selected, users }: Props) {
   const navigate = useNavigate();
   const [selectedOrg, selectOrg] = useSelectedOrgContext();
   const { organization } = row;
+  const { addUser } = usePostAddUserToOrganization();
+  const { removeUser } = usePostRemoveUserFromOrganization();
   const [open, setOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedUsers, setSelectedUsers] = React.useState<string[]>([]);
   const hasActivatedPlugins = organization.plugins.some((plugin) => plugin.isActivated);
+
+  const handleUserClick = async (userId: string) => {
+    const isUserSelected = selectedUsers.includes(userId);
+
+    if (isUserSelected) {
+      // Anropa removeUser med userId och organization.id
+      await removeUser(userId, organization.id);
+      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
+    } else {
+      // Anropa addUser med userId och organization.id
+      await addUser(userId, organization.id);
+      setSelectedUsers([...selectedUsers, userId]);
+    }
+  };
 
   useEffect(() => {
     const userNames: string[] = organization.users
@@ -113,7 +133,6 @@ export default function OrderTableRow({ row, selected, users }: Props) {
                 fontSize: '1rem',
               },
             }}
-            labelId="user-select-label"
             multiple
             displayEmpty
             value={selectedUsers}
@@ -122,7 +141,6 @@ export default function OrderTableRow({ row, selected, users }: Props) {
               if (selectedd.length === 0) {
                 return <p>Välj en användare</p>;
               }
-              // Visa första användarens namn följt av "..." om fler än en användare är vald
               return `${selectedd[0]}${selectedd.length > 1 ? '...' : ''}`;
             }}
             IconComponent={ArrowDropDownIcon}
@@ -151,7 +169,7 @@ export default function OrderTableRow({ row, selected, users }: Props) {
               />
             </ListSubheader>
             {filteredUsers.map((user) => (
-              <MenuItem key={user._id} value={user.name}>
+              <MenuItem key={user._id} onClick={() => handleUserClick(user._id!)}>
                 {user.name}
               </MenuItem>
             ))}

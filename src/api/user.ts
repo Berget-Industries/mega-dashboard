@@ -5,7 +5,7 @@ import { poster, fetcher, endpoints } from 'src/utils/axios';
 
 import { IUser } from 'src/types/user';
 
-export function useGetUsers({ users }: { users?: string }) {
+export function useGetUsers({ users }: { users?: IUser[] }) {
   const URL = `${endpoints.admin.userList}${users ? `?users=${users}` : ''}`;
   console.log('Request URL:', URL);
 
