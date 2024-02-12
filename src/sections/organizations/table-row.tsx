@@ -77,8 +77,7 @@ export default function OrderTableRow({ row, selected, users }: Props) {
   }, [organization, users]);
 
   useEffect(() => {
-    // Uppdatera för att använda användar-ID
-    const userIds = organization.users; // Antag att `organization.users` är en lista med användar-ID
+    const userIds = organization.users;
     setSelectedUsers(userIds);
   }, [organization, users]);
 
@@ -89,7 +88,6 @@ export default function OrderTableRow({ row, selected, users }: Props) {
       setSelectedUsers(selectedUsers.filter((id) => id !== userId));
     } else {
       await addUser(userId, organization.id);
-      // Kontrollera att användar-ID inte redan finns innan du lägger till det
       if (!selectedUsers.includes(userId)) {
         setSelectedUsers((currentSelected) => [...currentSelected, userId]);
       }
@@ -116,14 +114,11 @@ export default function OrderTableRow({ row, selected, users }: Props) {
 
   const renderValue = (selectedIds: string[]) => {
     if (selectedIds.length > 1) {
-      // Om det finns fler än en vald, visa den första användarens namn följt av "..."
       return `${getUserNameById(selectedIds[0])}...`;
     }
     if (selectedIds.length === 1) {
-      // Om endast en användare är vald, visa den användarens namn
       return getUserNameById(selectedIds[0]);
     }
-    // Om ingen användare är vald, visa en uppmaning att välja användare
     return 'Välj användare';
   };
 
@@ -157,8 +152,16 @@ export default function OrderTableRow({ row, selected, users }: Props) {
             renderValue={() => renderValue(selectedUsers)}
             IconComponent={ArrowDropDownIcon}
             sx={{
-              height: '40px',
+              maxHeight: '40px',
               '.MuiSelect-select': { py: '10px', display: 'flex', alignItems: 'center' },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 200, // Ange maximal höjd för dropdown-listan här
+                  overflow: 'auto', // Aktivera rullning om innehållet överskrider maxHeight
+                },
+              },
             }}
           >
             <ListSubheader>
@@ -168,6 +171,22 @@ export default function OrderTableRow({ row, selected, users }: Props) {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 variant="outlined"
                 fullWidth
+                sx={{
+                  '.MuiInputBase-root': {
+                    height: '40px',
+                    width: '100%', // Justera höjden här
+                  },
+                  '.MuiOutlinedInput-input': {
+                    padding: '10px 14px', // Minska padding för att minska höjd
+                    fontSize: '0.875rem', // Anpassa textstorlek om nödvändigt
+                  },
+                  '.MuiInputLabel-root': {
+                    transform: 'translate(14px, 12px) scale(1)', // Justera label position vid behov
+                  },
+                  '.MuiInputLabel-shrink': {
+                    transform: 'translate(14px, -6px) scale(0.75)', // Justera förminskad label position
+                  },
+                }}
               />
             </ListSubheader>
             {filteredUsers.map((user) => (
