@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 
 import Box from '@mui/material/Box';
@@ -68,6 +68,24 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
   const { addUser } = usePostAddUserToOrganization();
   const { removeUser } = usePostRemoveUserFromOrganization();
 
+  useEffect(() => {
+    const organizationName: string[] = user.organizations
+      .map((organizationId: string) =>
+        organization.find((organizations: IOrganization) => organizations._id === organizationId)
+      )
+      .filter(
+        (organizations: IOrganization | undefined): organizations is IOrganization =>
+          organization !== undefined
+      )
+      .map((organizations: IOrganization) => organizations.name);
+
+    setSelectedOrg(organizationName);
+  }, [organization, user.organizations]);
+
+  useEffect(() => {
+    setSelectedOrg(user.organizations);
+  }, [user.organizations]);
+
   const handleToggleDialog = () => {
     setOpen(!open);
   };
@@ -77,31 +95,31 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
     setSelectedOrg(typeof value === 'string' ? value.split(',') : value);
   };
 
-  const renderValue = (selectedIds: string[]) => {
-    if (selectedIds.length > 1) {
-      return `${selectedIds[0]}...`;
-    }
-    if (selectedIds.length === 1) {
-      return selectedIds[0];
-    }
-    return 'Välj organisation';
+  const renderValue = (selectedOrgIds: string[]) => {
+    const selectedOrgNames = selectedOrgIds
+      .map((orgId) => {
+        const org = organization.find((orgs) => orgs._id === orgId);
+        return org ? org.name : null;
+      })
+      .filter((name) => name !== null)
+      .join(', ');
+
+    return selectedOrgNames || 'Välj organisation';
   };
 
-  const handleOrgClick = async (userId: string) => {
-    const isUserSelected = selectedOrg.includes(userId);
-    if (isUserSelected) {
-      await removeUser(userId, organization[0]._id!); // Access the id property of the organization object
-      setSelectedOrg(selectedOrg.filter((id) => id !== userId));
+  const handleOrgClick = async (orgId: string) => {
+    const isOrgSelected = selectedOrg.includes(orgId);
+    if (isOrgSelected) {
+      await removeUser(user.id, orgId);
+      setSelectedOrg(selectedOrg.filter((id) => id !== orgId));
     } else {
-      await addUser(userId, organization[0]._id!); // Access the _id property of the organization object
-      if (!selectedOrg.includes(userId)) {
-        setSelectedOrg((currentSelected) => [...currentSelected, userId]);
-      }
+      await addUser(user.id, orgId);
+      setSelectedOrg((currentSelected) => [...currentSelected, orgId]);
     }
   };
 
-  const filteredUsers = organization.filter((organizations) =>
-    organizations.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOrganizations = organization.filter((org) =>
+    org.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const popover = usePopover();
@@ -142,15 +160,15 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
             MenuProps={{
               PaperProps: {
                 style: {
-                  maxHeight: 200, // Ange maximal höjd för dropdown-listan här
-                  overflow: 'auto', // Aktivera rullning om innehållet överskrider maxHeight
+                  maxHeight: 200,
+                  overflow: 'auto',
                 },
               },
             }}
           >
             <ListSubheader>
               <TextField
-                placeholder="Sök användare..."
+                placeholder="Sök organisation..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 variant="outlined"
@@ -173,7 +191,7 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
                 }}
               />
             </ListSubheader>
-            {filteredUsers.map((organizations) => (
+            {filteredOrganizations.map((organizations) => (
               <MenuItem
                 key={organizations._id}
                 value={organizations._id}
