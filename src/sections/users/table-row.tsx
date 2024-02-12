@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 
 import Box from '@mui/material/Box';
@@ -8,14 +8,30 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
+// eslint-disable-next-line import/no-cycle
+import { ArrowDropDownIcon } from '@mui/x-date-pickers';
+import {
+  Checkbox,
+  FormControl,
+  ListSubheader,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
+
+import {
+  usePostAddUserToOrganization,
+  usePostRemoveUserFromOrganization,
+} from 'src/api/organization';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
-// eslint-disable-next-line import/no-cycle
+import { IOrganization } from 'src/types/organization';
+
 import ConfirmDialog from './confirmDialog';
 
 // ----------------------------------------------------------------------
@@ -41,15 +57,74 @@ export interface IPlugin {
 type Props = {
   row: IUserTableRow;
   selected: boolean;
+  organization: IOrganization[];
 };
 
-export default function OrderTableRow({ row, selected }: Props) {
+export default function OrderTableRow({ row, selected, organization }: Props) {
   const { user } = row;
   const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedOrg, setSelectedOrg] = React.useState<string[]>([]);
+  const { addUser } = usePostAddUserToOrganization();
+  const { removeUser } = usePostRemoveUserFromOrganization();
+
+  useEffect(() => {
+    const organizationName: string[] = user.organizations
+      .map((organizationId: string) =>
+        organization.find((organizations: IOrganization) => organizations._id === organizationId)
+      )
+      .filter(
+        (organizations: IOrganization | undefined): organizations is IOrganization =>
+          organization !== undefined
+      )
+      .map((organizations: IOrganization) => organizations.name);
+
+    setSelectedOrg(organizationName);
+  }, [organization, user.organizations]);
+
+  useEffect(() => {
+    setSelectedOrg(user.organizations);
+  }, [user.organizations]);
 
   const handleToggleDialog = () => {
     setOpen(!open);
   };
+
+  const handleSelectOrg = (event: SelectChangeEvent<typeof selectedOrg>) => {
+    const { value } = event.target;
+    setSelectedOrg(typeof value === 'string' ? value.split(',') : value);
+  };
+
+  const renderValue = (selectedOrgIds: string[]) => {
+    if (selectedOrgIds.length > 1) {
+      const firstOrgName =
+        organization.find((org) => org._id === selectedOrgIds[0])?.name || 'Okänd organisation';
+
+      return `${firstOrgName}, ...`;
+    }
+    if (selectedOrg.length === 1) {
+      const orgName =
+        organization.find((org) => org._id === selectedOrg[0])?.name || 'Okänd organisation';
+      return orgName;
+    }
+
+    return 'Välj organisation';
+  };
+
+  const handleOrgClick = async (orgId: string) => {
+    const isOrgSelected = selectedOrg.includes(orgId);
+    if (isOrgSelected) {
+      await removeUser(user.id, orgId);
+      setSelectedOrg(selectedOrg.filter((id) => id !== orgId));
+    } else {
+      await addUser(user.id, orgId);
+      setSelectedOrg((currentSelected) => [...currentSelected, orgId]);
+    }
+  };
+
+  const filteredOrganizations = organization.filter((org) =>
+    org.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const popover = usePopover();
 
@@ -73,20 +148,72 @@ export default function OrderTableRow({ row, selected }: Props) {
         />
       </TableCell>
 
-      <TableCell sx={{ verticalAlign: 'middle' }}>
-        <ListItemText
-          primary={user.organizations.length}
-          primaryTypographyProps={{
-            typography: 'body2',
-            noWrap: true,
-            textAlign: 'center',
-          }}
-          secondaryTypographyProps={{
-            mt: 0.5,
-            component: 'span',
-            typography: 'caption',
-          }}
-        />
+      <TableCell>
+        <FormControl fullWidth>
+          <Select
+            multiple
+            displayEmpty
+            value={selectedOrg}
+            onChange={handleSelectOrg}
+            renderValue={() => renderValue(selectedOrg)}
+            IconComponent={ArrowDropDownIcon}
+            sx={{
+              maxWidth: '200px',
+              '.MuiSelect-select': {
+                py: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 200,
+                  overflow: 'auto',
+                },
+              },
+            }}
+          >
+            <ListSubheader>
+              <TextField
+                placeholder="Sök organisation..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                variant="outlined"
+                fullWidth
+                sx={{
+                  '.MuiInputBase-root': {
+                    height: '40px',
+                    width: '100%',
+                    marginTop: '4px',
+                  },
+                  '.MuiOutlinedInput-input': {
+                    padding: '10px 14px',
+                    fontSize: '0.875rem',
+                  },
+                  '.MuiInputLabel-root': {
+                    transform: 'translate(14px, 12px) scale(1)',
+                  },
+                  '.MuiInputLabel-shrink': {
+                    transform: 'translate(14px, -6px) scale(0.75)',
+                  },
+                }}
+              />
+            </ListSubheader>
+            {filteredOrganizations.map((organizations) => (
+              <MenuItem
+                key={organizations._id}
+                value={organizations._id}
+                onClick={() => handleOrgClick(organizations._id!)}
+              >
+                <Checkbox checked={selectedOrg.includes(organizations._id!)} />
+                {organizations.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </TableCell>
       <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
         <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>

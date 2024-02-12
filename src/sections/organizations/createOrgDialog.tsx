@@ -39,6 +39,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
 
   const handleCreateOrganization = async () => {
     const organizationData = {
+      _id: '',
       name: organizationName,
       logoUrl: logoUrl || '',
       users,

@@ -8,7 +8,7 @@ export interface IPlugin {
   organization: string;
 }
 export interface IOrganization {
-  _id?: string;
+  _id: string;
   plugins?: IPlugin[];
   name: string;
   logoUrl?: string;
