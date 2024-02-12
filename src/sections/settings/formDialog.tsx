@@ -10,6 +10,7 @@ import { IPlugin } from 'src/types/organization';
 import { Container, Stack } from '@mui/system';
 import { Typography, Switch, Grid } from '@mui/material';
 import { usePlugin } from 'src/api/organization';
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 interface FormDialogProps {
   plugin: IPlugin | undefined;
@@ -17,6 +18,7 @@ interface FormDialogProps {
 }
 
 export default function FormDialog({ plugin, onClose }: FormDialogProps) {
+  const [selectedOrg] = useSelectedOrgContext();
   const { updatePluginConfig } = usePlugin();
   const [fullScreen, setFullScreen] = React.useState(false);
   const [pluginConfig, setPluginConfig] = React.useState<Record<string, any>>({});
@@ -47,9 +49,9 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
           updatePluginConfig({
-            organizationId: plugin.organization,
             config: pluginConfig,
-            name: plugin.name,
+            pluginId: plugin._id,
+            organizationId: selectedOrg?._id || '',
           });
           onClose();
         },
@@ -385,6 +387,20 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 setPluginConfig({ ...pluginConfig, imapFrom: event.target.value });
               }}
             />
+
+            <TextField
+              id="_megaApiKey"
+              label="MEGA API KEY"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.apiKey}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({ ...pluginConfig, apiKey: event.target.value });
+              }}
+            />
           </>
         )}
 
@@ -395,7 +411,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
             OBS
           */}
 
-        {plugin.name === 'waiteraid' && (
+        {plugin.name === 'mega-assistant-alex-waiteraid' && (
           <>
             <Stack spacing={2} justifyContent="space-between" alignItems="center" direction="row">
               <Typography sx={{ p: 1 }} variant="h6" color="text.secondary">
@@ -429,9 +445,17 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setFullScreen(!fullScreen)}>Fullscreen</Button>
-        <Button onClick={onClose}>Avbryt</Button>
-        <Button type="submit">Ändra</Button>
+        <span style={{ flexGrow: 1 }}>
+          <Button variant="outlined" onClick={onClose}>
+            Avbryt
+          </Button>
+        </span>
+        <Button variant="outlined" onClick={() => setFullScreen(!fullScreen)}>
+          Fullscreen
+        </Button>
+        <Button type="submit" variant="contained" color="primary">
+          Spara
+        </Button>
       </DialogActions>
     </Dialog>
   );

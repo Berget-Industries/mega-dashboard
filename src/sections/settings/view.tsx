@@ -1,33 +1,35 @@
 import React, { useState, useEffect } from 'react';
 
-import Card from '@mui/material/Card';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
 import { alpha, useTheme } from '@mui/material/styles';
 import { Stack } from '@mui/system';
+import Paper from '@mui/material/Paper';
+
+import DeleteIcon from '@mui/icons-material/Delete';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import { IPlugin } from 'src/types/organization';
 import { usePlugin, useGetOrganizationPlugins } from 'src/api/organization';
 import { useSettingsContext } from 'src/components/settings';
-import { useAuthContext } from 'src/auth/hooks';
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 import FormDialog from './formDialog';
 import NewPluginFrom from './newPluginForm';
+import ConfirmDialog from './confirmDialog';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAnalyticsView() {
-  const { activatePlugin, deactivatePlugin } = usePlugin();
+  const { activatePlugin, deactivatePlugin, removePlugin } = usePlugin();
   const [selectedOrg] = useSelectedOrgContext();
   const settings = useSettingsContext();
   const theme = useTheme();
 
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const { plugins, pluginsLoading, pluginsError, pluginsValidating } = useGetOrganizationPlugins({
     organizationId: selectedOrg?._id,
   });
@@ -52,22 +54,18 @@ export default function OverviewAnalyticsView() {
 
   useEffect(() => {
     if (plugins) {
+      console.log(plugins);
       setAllPlugins(plugins);
     }
   }, [plugins]);
 
-  const handleTogglePlugin = (plugin: IPlugin) => {
+  const handleTogglePlugin = async (plugin: IPlugin) => {
     const funcToRun = plugin.isActivated ? deactivatePlugin : activatePlugin;
-    funcToRun({ organizationId: selectedOrg?._id as string, name: plugin.name });
-
-    const newPlugins = allPlugins.map((_) =>
-      _._id === plugin._id ? { ..._, isActivated: !_.isActivated } : _
-    );
-    setAllPlugins(newPlugins);
+    await funcToRun({ pluginId: plugin._id, organizationId: selectedOrg?._id as string });
   };
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'xl'}>
+    <Container maxWidth={settings.themeStretch ? false : 'md'}>
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -83,44 +81,86 @@ export default function OverviewAnalyticsView() {
       </Stack>
 
       {[actionTypesInput, actionTypesChain, actionTypesTool].map((_plugins) => (
-        <Grid
-          container
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="center"
-          alignItems="center"
-          spacing={2}
-        >
-          {_plugins.length === 0 && (
-            <Typography variant="h6" color="text.secondary">
-              Inga plugins av denna typ.
-            </Typography>
-          )}
+        <Container sx={{ pt: 2 }}>
+          <Typography variant="h6" color="text.primary">
+            {`${_plugins[0]?.type.toUpperCase()}:s` || `Inga plugins av denna typ. 🤷‍♂️ `}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            {_plugins[0]?.type === 'input' && (
+              <span>
+                Här finner du alla organisationen input plugins.
+                <br />
+                Det är som bryggan mellan användare och chain plugins.
+                <br />
+                Känn dig fri att lägga till hur många input plugins som du vill. 😎
+              </span>
+            )}
+            {_plugins[0]?.type === 'chain' && (
+              <span>
+                Detta är alla organisationenens kedjor.
+                <br />
+                Varje kedja kan tolkas dem som en {`"ai"`} med egana instruktioner och kunskaper.
+                <br />
+                En organisation kan MAX ha en instans av varje chain plugin.
+              </span>
+            )}
+            {_plugins[0]?.type === 'tool' && (
+              <span>
+                Detta är verktygen som är tillgängliga för en assistent att använda.
+                <br />
+                Lägg till dem egenskaper du vill att Mega Assistant ska kunna använda.
+                <br />
+                En organisation kan MAX ha en instans av varje tool plugin.
+              </span>
+            )}
+          </Typography>
+
           {_plugins.map((plugin) => (
-            <Grid xs={2.5}>
-              <Card variant="elevation">
-                <CardContent>
+            <Paper variant="outlined" sx={{ mb: 3 }}>
+              <Stack direction="row" justifyContent="center" alignItems="center">
+                <Container sx={{ flexGrow: 1, p: 1 }} maxWidth="md">
                   <Typography variant="h5">{plugin.name}</Typography>
                   <Typography variant="body1" color="text.secondary">
-                    {plugin.type}
+                    {plugin.name === 'mailer' && plugin.config.imapConfig.user}
+                    {plugin.name === 'mega-assistant-alex' && plugin.config.plugins.join(', ')}
+                    {plugin.name === 'mega-assistant-eva' && plugin.config.model}
+                    {plugin.name === 'auto-filter' &&
+                      `${Object.keys(plugin.config.rules).length} aktiverade sorterings regler.`}
                   </Typography>
-                </CardContent>
-                <CardActions sx={{ justifyContent: 'space-between', padding: 3 }}>
-                  <Button onClick={() => setOpenPluginConfigId(plugin._id)} variant="outlined">
-                    Ändra konfig
-                  </Button>
+                </Container>
+                <>
                   <Switch
                     checked={plugin.isActivated}
                     onClick={() => {
                       handleTogglePlugin(plugin);
                     }}
                   />
-                </CardActions>
-              </Card>
-            </Grid>
+                  <IconButton
+                    aria-labelledby="settings"
+                    onClick={() => setOpenPluginConfigId(plugin._id)}
+                    aria-label="settings"
+                  >
+                    <SettingsIcon />
+                  </IconButton>
+                  <IconButton onClick={() => setConfirmDelete(plugin._id)} aria-label="delete">
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              </Stack>
+            </Paper>
           ))}
-        </Grid>
+        </Container>
       ))}
+      <ConfirmDialog
+        open={Boolean(confirmDelete)}
+        onClose={() => setConfirmDelete(null)}
+        onSuccess={() => {
+          if (confirmDelete && selectedOrg?._id) {
+            removePlugin({ pluginId: confirmDelete, organizationId: selectedOrg._id });
+            setConfirmDelete(null);
+          }
+        }}
+      />
       <FormDialog
         plugin={plugins.find((_) => _._id === openPluginConfigId)}
         onClose={() => setOpenPluginConfigId(null)}
