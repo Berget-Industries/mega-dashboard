@@ -217,6 +217,7 @@ export default function UserTable({ users, organizations }: UserTableProps) {
                       key={row.id}
                       row={row}
                       selected={table.selected.includes(row.id)}
+                      organization={organizations}
                     />
                   ))}
                 <TableEmptyRows

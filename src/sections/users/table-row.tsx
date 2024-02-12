@@ -8,14 +8,30 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
+// eslint-disable-next-line import/no-cycle
+import { ArrowDropDownIcon } from '@mui/x-date-pickers';
+import {
+  Checkbox,
+  FormControl,
+  ListSubheader,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
+
+import {
+  usePostAddUserToOrganization,
+  usePostRemoveUserFromOrganization,
+} from 'src/api/organization';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
-// eslint-disable-next-line import/no-cycle
+import { IOrganization } from 'src/types/organization';
+
 import ConfirmDialog from './confirmDialog';
 
 // ----------------------------------------------------------------------
@@ -41,15 +57,52 @@ export interface IPlugin {
 type Props = {
   row: IUserTableRow;
   selected: boolean;
+  organization: IOrganization[];
 };
 
-export default function OrderTableRow({ row, selected }: Props) {
+export default function OrderTableRow({ row, selected, organization }: Props) {
   const { user } = row;
   const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedOrg, setSelectedOrg] = React.useState<string[]>([]);
+  const { addUser } = usePostAddUserToOrganization();
+  const { removeUser } = usePostRemoveUserFromOrganization();
 
   const handleToggleDialog = () => {
     setOpen(!open);
   };
+
+  const handleSelectOrg = (event: SelectChangeEvent<typeof selectedOrg>) => {
+    const { value } = event.target;
+    setSelectedOrg(typeof value === 'string' ? value.split(',') : value);
+  };
+
+  const renderValue = (selectedIds: string[]) => {
+    if (selectedIds.length > 1) {
+      return `${selectedIds[0]}...`;
+    }
+    if (selectedIds.length === 1) {
+      return selectedIds[0];
+    }
+    return 'Välj organisation';
+  };
+
+  const handleOrgClick = async (userId: string) => {
+    const isUserSelected = selectedOrg.includes(userId);
+    if (isUserSelected) {
+      await removeUser(userId, organization[0]._id!); // Access the id property of the organization object
+      setSelectedOrg(selectedOrg.filter((id) => id !== userId));
+    } else {
+      await addUser(userId, organization[0]._id!); // Access the _id property of the organization object
+      if (!selectedOrg.includes(userId)) {
+        setSelectedOrg((currentSelected) => [...currentSelected, userId]);
+      }
+    }
+  };
+
+  const filteredUsers = organization.filter((organizations) =>
+    organizations.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const popover = usePopover();
 
@@ -73,20 +126,65 @@ export default function OrderTableRow({ row, selected }: Props) {
         />
       </TableCell>
 
-      <TableCell sx={{ verticalAlign: 'middle' }}>
-        <ListItemText
-          primary={user.organizations.length}
-          primaryTypographyProps={{
-            typography: 'body2',
-            noWrap: true,
-            textAlign: 'center',
-          }}
-          secondaryTypographyProps={{
-            mt: 0.5,
-            component: 'span',
-            typography: 'caption',
-          }}
-        />
+      <TableCell>
+        <FormControl fullWidth>
+          <Select
+            multiple
+            displayEmpty
+            value={selectedOrg}
+            onChange={handleSelectOrg}
+            renderValue={() => renderValue(selectedOrg)}
+            IconComponent={ArrowDropDownIcon}
+            sx={{
+              maxHeight: '40px',
+              '.MuiSelect-select': { py: '10px', display: 'flex', alignItems: 'center' },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 200, // Ange maximal höjd för dropdown-listan här
+                  overflow: 'auto', // Aktivera rullning om innehållet överskrider maxHeight
+                },
+              },
+            }}
+          >
+            <ListSubheader>
+              <TextField
+                placeholder="Sök användare..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                variant="outlined"
+                fullWidth
+                sx={{
+                  '.MuiInputBase-root': {
+                    height: '40px',
+                    width: '100%', // Justera höjden här
+                  },
+                  '.MuiOutlinedInput-input': {
+                    padding: '10px 14px', // Minska padding för att minska höjd
+                    fontSize: '0.875rem', // Anpassa textstorlek om nödvändigt
+                  },
+                  '.MuiInputLabel-root': {
+                    transform: 'translate(14px, 12px) scale(1)', // Justera label position vid behov
+                  },
+                  '.MuiInputLabel-shrink': {
+                    transform: 'translate(14px, -6px) scale(0.75)', // Justera förminskad label position
+                  },
+                }}
+              />
+            </ListSubheader>
+            {filteredUsers.map((organizations) => (
+              <MenuItem
+                key={organizations._id}
+                value={organizations._id}
+                onClick={() => handleOrgClick(organizations._id!)}
+              >
+                <Checkbox checked={selectedOrg.includes(organizations._id!)} />
+                {organizations.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </TableCell>
       <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
         <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
