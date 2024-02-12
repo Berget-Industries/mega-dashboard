@@ -80,13 +80,15 @@ export default function OverviewAnalyticsView() {
         </Button>
       </Stack>
 
-      {[actionTypesInput, actionTypesChain, actionTypesTool].map((_plugins) => (
+      {[actionTypesInput, actionTypesChain, actionTypesTool].map((_plugins, index) => (
         <Container sx={{ pt: 2 }}>
           <Typography variant="h6" color="text.primary">
-            {`${_plugins[0]?.type.toUpperCase()}:s` || `Inga plugins av denna typ. 🤷‍♂️ `}
+            {index === 0 && 'Input Plugins'}
+            {index === 1 && 'Chain Plugins'}
+            {index === 2 && 'Tool Plugins'}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {_plugins[0]?.type === 'input' && (
+            {index === 0 && (
               <span>
                 Här finner du alla organisationen input plugins.
                 <br />
@@ -95,7 +97,7 @@ export default function OverviewAnalyticsView() {
                 Känn dig fri att lägga till hur många input plugins som du vill. 😎
               </span>
             )}
-            {_plugins[0]?.type === 'chain' && (
+            {index === 1 && (
               <span>
                 Detta är alla organisationenens kedjor.
                 <br />
@@ -104,7 +106,7 @@ export default function OverviewAnalyticsView() {
                 En organisation kan MAX ha en instans av varje chain plugin.
               </span>
             )}
-            {_plugins[0]?.type === 'tool' && (
+            {index === 2 && (
               <span>
                 Detta är verktygen som är tillgängliga för en assistent att använda.
                 <br />
@@ -114,38 +116,62 @@ export default function OverviewAnalyticsView() {
               </span>
             )}
           </Typography>
+          {_plugins.length === 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Det finns inga plugins i denna kategori.
+            </Typography>
+          )}
 
           {_plugins.map((plugin) => (
-            <Paper variant="outlined" sx={{ mb: 3 }}>
+            <Paper
+              variant="outlined"
+              sx={{
+                mb: 3,
+                borderColor: plugin.isActivated
+                  ? theme.palette.primary.light
+                  : theme.palette.divider,
+              }}
+            >
               <Stack direction="row" justifyContent="center" alignItems="center">
-                <Container sx={{ flexGrow: 1, p: 1 }} maxWidth="md">
-                  <Typography variant="h5">{plugin.name}</Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    {plugin.name === 'mailer' && plugin.config.imapConfig.user}
-                    {plugin.name === 'mega-assistant-alex' && plugin.config.plugins.join(', ')}
-                    {plugin.name === 'mega-assistant-eva' && plugin.config.model}
-                    {plugin.name === 'auto-filter' &&
-                      `${Object.keys(plugin.config.rules).length} aktiverade sorterings regler.`}
-                  </Typography>
+                <Container sx={{ p: 1 }} maxWidth="md">
+                  <Stack direction="row" alignItems="center">
+                    <span style={{ flexGrow: 1 }}>
+                      <Typography variant="h5">{plugin.name}</Typography>
+                      <Typography variant="body1" color="text.secondary">
+                        {plugin.name === 'mailer' && (
+                          <Stack direction="column" justifyContent="center">
+                            <span>
+                              Auto Filter: {plugin.config.autoFilter ? 'Aktiv' : 'Inaktiv'}
+                            </span>
+                            <span>Address: {plugin.config.imapConfig?.user}</span>
+                          </Stack>
+                        )}
+                        {plugin.name === 'mega-assistant-alex' && plugin.config.plugins.join(', ')}
+                        {plugin.name === 'mega-assistant-eva' && plugin.config.model}
+                        {plugin.name === 'auto-filter' &&
+                          `${
+                            Object.keys(plugin.config.rules).length
+                          } aktiverade sorterings regler.`}
+                      </Typography>
+                    </span>
+                    <Switch
+                      checked={plugin.isActivated}
+                      onClick={() => {
+                        handleTogglePlugin(plugin);
+                      }}
+                    />
+                    <IconButton
+                      aria-labelledby="settings"
+                      onClick={() => setOpenPluginConfigId(plugin._id)}
+                      aria-label="settings"
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+                    <IconButton onClick={() => setConfirmDelete(plugin._id)} aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Stack>
                 </Container>
-                <>
-                  <Switch
-                    checked={plugin.isActivated}
-                    onClick={() => {
-                      handleTogglePlugin(plugin);
-                    }}
-                  />
-                  <IconButton
-                    aria-labelledby="settings"
-                    onClick={() => setOpenPluginConfigId(plugin._id)}
-                    aria-label="settings"
-                  >
-                    <SettingsIcon />
-                  </IconButton>
-                  <IconButton onClick={() => setConfirmDelete(plugin._id)} aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
-                </>
               </Stack>
             </Paper>
           ))}
@@ -154,9 +180,9 @@ export default function OverviewAnalyticsView() {
       <ConfirmDialog
         open={Boolean(confirmDelete)}
         onClose={() => setConfirmDelete(null)}
-        onSuccess={() => {
+        onSuccess={async () => {
           if (confirmDelete && selectedOrg?._id) {
-            removePlugin({ pluginId: confirmDelete, organizationId: selectedOrg._id });
+            await removePlugin({ pluginId: confirmDelete, organizationId: selectedOrg._id });
             setConfirmDelete(null);
           }
         }}

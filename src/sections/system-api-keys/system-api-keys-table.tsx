@@ -124,36 +124,7 @@ export default function SystemAPIKeysTable({ apiKeys, organizations }: SystemAPI
 
   console.log('Här är alla api nycklar: ', apiKeys);
 
-  const [filters, setFilters] = useState(defaultFilters);
-  const dateError =
-    filters.startDate && filters.endDate
-      ? filters.startDate.getTime() > filters.endDate.getTime()
-      : false;
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(table.order, table.orderBy),
-    filters,
-    dateError,
-  });
   const denseHeight = table.dense ? 52 : 72;
-  const canReset =
-    !!filters.name || filters.status !== 'all' || (!!filters.startDate && !!filters.endDate);
-  const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
-
-  const handleFilters = useCallback(
-    (name: string, value: IOrderTableFilterValue) => {
-      table.onResetPage();
-      setFilters((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
-    },
-    [table]
-  );
-
-  const handleResetFilters = useCallback(() => {
-    setFilters(defaultFilters);
-  }, []);
 
   return (
     <Container maxWidth="xl">
@@ -178,12 +149,6 @@ export default function SystemAPIKeysTable({ apiKeys, organizations }: SystemAPI
         </Stack>
       </Stack>
       <Card>
-        <FilterOrganisationBar
-          filters={filters}
-          onFilters={handleFilters}
-          canReset={canReset}
-          onResetFilters={handleResetFilters}
-        />
         <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
           <TableSelectedAction
             dense={table.dense}
@@ -207,7 +172,7 @@ export default function SystemAPIKeysTable({ apiKeys, organizations }: SystemAPI
                 onSort={table.onSort}
               />
               <TableBody>
-                {dataFiltered
+                {tableData
                   .slice(
                     table.page * table.rowsPerPage,
                     table.page * table.rowsPerPage + table.rowsPerPage
@@ -223,13 +188,13 @@ export default function SystemAPIKeysTable({ apiKeys, organizations }: SystemAPI
                   height={denseHeight}
                   emptyRows={emptyRows(table.page, table.rowsPerPage, tableData.length)}
                 />
-                <TableNoData notFound={notFound} />
+                <TableNoData notFound={tableData.length === 0} />
               </TableBody>
             </Table>
           </Scrollbar>
         </TableContainer>
         <TablePaginationCustom
-          count={dataFiltered.length}
+          count={tableData.length}
           page={table.page}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}

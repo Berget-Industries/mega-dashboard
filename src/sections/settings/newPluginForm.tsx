@@ -1,13 +1,17 @@
 import * as React from 'react';
+import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import ListSubheader from '@mui/material/ListSubheader';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { IPlugin } from 'src/types/organization';
 import { Container, Stack } from '@mui/system';
+import { alpha, useTheme } from '@mui/material/styles';
 import { usePlugin } from 'src/api/organization';
 import {
   FormControl,
@@ -20,6 +24,22 @@ import {
   Grid,
 } from '@mui/material';
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
+
+const CustomListSubheader = (props: any) => {
+  const theme = useTheme();
+  return (
+    <ListSubheader
+      {...props}
+      sx={{
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        lineHeight: '2rem',
+        mt: 2,
+        borderRadius: theme.shape.borderRadius / 10,
+      }}
+    />
+  );
+};
 
 interface FormDialogProps {
   open: boolean;
@@ -44,13 +64,11 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
   const [selectedOrg] = useSelectedOrgContext();
   const { getAvailablePlugins, createNewPlugin } = usePlugin();
   const [fullScreen, setFullScreen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const [installedPlugins, setInstalledPlugins] = React.useState<IPlugin[]>([]);
   const [pluginConfig, setPluginConfig] = React.useState<Record<string, any>>({});
   const [defaultPlugin, setDefaultPlugin] = React.useState<availablePlugin | null>(null);
   const [availablePlugins, setAvailablePlugins] = React.useState<availablePlugin[]>([]);
-
-  const [newPlugin, setNewPlugin] = React.useState<newPlugin | null>(null);
 
   React.useEffect(() => {
     if (!selectedOrg?._id) return;
@@ -61,34 +79,30 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
     });
   }, [getAvailablePlugins, selectedOrg]);
 
-  React.useEffect(() => {
-    if (defaultPlugin && selectedOrg?._id) {
-      setNewPlugin({
-        name: defaultPlugin.name,
-        type: defaultPlugin.type,
-        config: defaultPlugin.defaultConfig,
-        organization: selectedOrg._id,
-      });
-      setPluginConfig(defaultPlugin.defaultConfig);
-    }
-  }, [defaultPlugin, selectedOrg]);
+  const handleClose = () => {
+    onClose();
+    setPluginConfig({});
+    setDefaultPlugin(null);
+  };
 
   return (
     <Dialog
       open={open}
       fullScreen={fullScreen}
       fullWidth
-      onClose={onClose}
+      onClose={handleClose}
       PaperProps={{
         component: 'form',
         onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
+          setIsLoading(true);
           await createNewPlugin({
             organizationId: selectedOrg?._id as string,
-            config: pluginConfig,
+            config: pluginConfig as Record<string, any>,
             name: defaultPlugin?.name as string,
           });
-          onClose();
+          setIsLoading(false);
+          handleClose();
         },
       }}
     >
@@ -98,7 +112,7 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
         <FormControl fullWidth margin="normal">
           <InputLabel id="org-select-label">Välj en eller flera organisationer</InputLabel>
           <Select
-            style={{ maxHeight: 300, overflowY: 'auto' }}
+            style={{ overflowY: 'scroll' }}
             labelId="org-select-label"
             id="org-select"
             value={defaultPlugin?.name}
@@ -121,11 +135,50 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
               },
             }}
           >
-            {availablePlugins.map((availablePlugin, index) => (
-              <MenuItem key={index} value={availablePlugin.name} sx={{ padding: '10px 16px' }}>
-                {availablePlugin.name}
-              </MenuItem>
-            ))}
+            {availablePlugins.filter((_) => _.type === 'input').length !== 0 && (
+              <CustomListSubheader>Inputs</CustomListSubheader>
+            )}
+            {availablePlugins
+              .filter((_) => _.type === 'input')
+              .map((availablePlugin, index) => (
+                <MenuItem
+                  key={`input-${index}`}
+                  value={availablePlugin.name}
+                  sx={{ padding: '10px 16px' }}
+                >
+                  {availablePlugin.name}
+                </MenuItem>
+              ))}
+
+            {availablePlugins.filter((_) => _.type === 'chain').length !== 0 && (
+              <CustomListSubheader>Chains</CustomListSubheader>
+            )}
+            {availablePlugins
+              .filter((_) => _.type === 'chain')
+              .map((availablePlugin, index) => (
+                <MenuItem
+                  key={`chain-${index}`}
+                  value={availablePlugin.name}
+                  sx={{ padding: '10px 16px' }}
+                >
+                  {availablePlugin.name}
+                </MenuItem>
+              ))}
+
+            {availablePlugins.filter((_) => _.type === 'tool').length !== 0 && (
+              <CustomListSubheader>Tools</CustomListSubheader>
+            )}
+            {availablePlugins
+              .filter((_) => _.type === 'tool')
+              .map((availablePlugin, index) => (
+                <MenuItem
+                  key={`tool-${index}`}
+                  value={availablePlugin.name}
+                  sx={{ padding: '10px 16px' }}
+                >
+                  {availablePlugin.name}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
         {/*
@@ -298,7 +351,7 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
               ))}
             {pluginConfig.rules?.length !== 0 && (
               <Button
-                sx={{ pt: 4 }}
+                sx={{ mt: 4 }}
                 onClick={() => {
                   const newRules = { ...pluginConfig.rules };
                   newRules[''] = '';
@@ -497,16 +550,16 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
       </DialogContent>
       <DialogActions>
         <span style={{ flexGrow: 1 }}>
-          <Button variant="outlined" onClick={onClose}>
+          <Button variant="outlined" onClick={handleClose}>
             Avbryt
           </Button>
         </span>
         <Button variant="outlined" onClick={() => setFullScreen(!fullScreen)}>
           Fullscreen
         </Button>
-        <Button type="submit" variant="contained" color="primary">
+        <LoadingButton loading={isLoading} type="submit" variant="contained" color="primary">
           Skapa
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

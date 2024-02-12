@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -21,6 +22,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
   const [selectedOrg] = useSelectedOrgContext();
   const { updatePluginConfig } = usePlugin();
   const [fullScreen, setFullScreen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [pluginConfig, setPluginConfig] = React.useState<Record<string, any>>({});
 
   React.useEffect(() => {
@@ -46,13 +48,15 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
       onClose={onClose}
       PaperProps={{
         component: 'form',
-        onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+        onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
-          updatePluginConfig({
+          setIsLoading(true);
+          await updatePluginConfig({
             config: pluginConfig,
             pluginId: plugin._id,
             organizationId: selectedOrg?._id || '',
           });
+          setIsLoading(false);
           onClose();
         },
       }}
@@ -453,9 +457,9 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
         <Button variant="outlined" onClick={() => setFullScreen(!fullScreen)}>
           Fullscreen
         </Button>
-        <Button type="submit" variant="contained" color="primary">
+        <LoadingButton loading={isLoading} type="submit" variant="contained" color="primary">
           Spara
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );
