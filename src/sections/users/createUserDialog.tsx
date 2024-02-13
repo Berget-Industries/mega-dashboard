@@ -12,6 +12,7 @@ import {
   Select,
   OutlinedInput,
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { usePostUsers } from 'src/api/user';
 import { useGetOrganizations } from 'src/api/organization';
 import { IOrganization } from 'src/types/organization';
@@ -29,6 +30,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
   const [email, setEmail] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [organizations, setOrganizations] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleCloseDialog = () => {
     setOrganizations([]);
@@ -56,6 +58,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
     }
 
     try {
+      setIsLoading(true);
       await createUser(userData);
       console.log('Användare skapades.');
 
@@ -65,6 +68,9 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       setEmail('');
     } catch (error) {
       console.error('Fel vid skapande av organisation:', error);
+    } finally {
+      setIsLoading(false);
+      handleCloseDialog();
     }
   };
 
@@ -125,11 +131,19 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
           </Select>
         </FormControl>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog}>Avbryt</Button>
-        <Button onClick={handleCreateUser} type="submit">
-          Lägg till
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
+        <Button variant="outlined" onClick={handleCloseDialog}>
+          Avbryt
         </Button>
+        <LoadingButton
+          loading={isLoading}
+          onClick={handleCreateUser}
+          type="submit"
+          variant="contained"
+          color="primary"
+        >
+          Lägg till
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

@@ -1,3 +1,5 @@
+import React from 'react';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import { useTheme } from '@mui/material/styles';
@@ -6,6 +8,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DialogContentText from '@mui/material/DialogContentText';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useRemoveUsers } from 'src/api/user';
 
 interface CreateOrgDialogProps {
@@ -20,13 +23,12 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { removeUser } = useRemoveUsers();
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleRemove = () => {
-    removeUser(userId);
-    handleClose();
-  };
-
-  const handleCloseDialog = () => {
+  const handleRemove = async () => {
+    setIsLoading(true);
+    await removeUser(userId);
+    setIsLoading(false);
     handleClose();
   };
 
@@ -35,7 +37,7 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
       fullScreen={fullScreen}
       sx={{ '& .MuiDialog-paper': { width: '30vw', maxHeight: 435 } }}
       open={open}
-      onClose={handleCloseDialog}
+      onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
     >
       <DialogTitle id="responsive-dialog-title">Är du säker?</DialogTitle>
@@ -43,12 +45,20 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
         <DialogContentText>Vill du ta bort {user}?</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={handleCloseDialog}>
-          Avbryt
-        </Button>
-        <Button onClick={handleRemove} autoFocus sx={{ color: 'error.main' }}>
+        <span style={{ flexGrow: 1 }}>
+          <Button variant="outlined" autoFocus onClick={handleClose}>
+            Avbryt
+          </Button>
+        </span>
+        <LoadingButton
+          color="error"
+          variant="contained"
+          loading={isLoading}
+          onClick={handleRemove}
+          autoFocus
+        >
           Ta bort användare
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );
