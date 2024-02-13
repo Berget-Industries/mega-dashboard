@@ -7,6 +7,7 @@ import {
   Button,
   TextField,
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { usePostOrganizations } from 'src/api/organization';
 import { useGetUsers } from 'src/api/user';
 import { CustomDropdown } from 'src/components/custom-dropdown';
@@ -24,6 +25,7 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
   const [organizationName, setOrganizationName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleCloseDialog = () => {
     setSelectedUsers([]);
@@ -45,6 +47,12 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
       return;
     }
 
+    const nonEmptyUsers = users.filter((user) => user.trim() !== '');
+    if (nonEmptyUsers.length === 0) {
+      alert('Minst en användare måste anges.');
+      return;
+    }
+
     try {
       await createOrganization(organizationData);
       console.log('Organisationen skapades.');
@@ -52,6 +60,9 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
       handleCloseDialog();
     } catch (error) {
       console.error('Fel vid skapande av organisation:', error);
+    } finally {
+      setIsLoading(false);
+      handleCloseDialog();
     }
   };
 
@@ -89,11 +100,19 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
           }}
         />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog}>Avbryt</Button>
-        <Button onClick={handleCreateOrganization} type="submit">
-          Lägg till
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
+        <Button variant="outlined" onClick={handleCloseDialog}>
+          Avbryt
         </Button>
+        <LoadingButton
+          loading={isLoading}
+          onClick={handleCreateOrganization}
+          type="submit"
+          variant="contained"
+          color="primary"
+        >
+          Lägg till
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

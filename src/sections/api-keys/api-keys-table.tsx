@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
+import LoadingButton from '@mui/lab/LoadingButton';
 import TableContainer from '@mui/material/TableContainer';
 import { Container, Stack, Typography } from '@mui/material';
 
@@ -102,6 +103,7 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
   const [open, setOpen] = React.useState(false);
   const [selectedOrg] = useSelectedOrgContext();
   const { createAPIKey } = usePostCreateAPIKeys();
+  const [isCreatingApiKey, setIsCreatingApiKey] = useState<boolean>(false);
 
   const handleCreateAPIKey = useCallback(async () => {
     if (selectedOrg && selectedOrg._id) {
@@ -110,10 +112,13 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
         systemKey: false,
       };
       try {
+        setIsCreatingApiKey(true);
         const response = await createAPIKey(apiKeyData);
         console.log('API-nyckel skapad:', response);
       } catch (error) {
         console.error('Fel vid skapande av API-nyckel:', error);
+      } finally {
+        setIsCreatingApiKey(false);
       }
     } else {
       console.error('Ingen organisation vald');
@@ -168,9 +173,9 @@ export default function APIKeysTable({ apiKeys }: APIKeysTableProps) {
           API Nycklar 🔑
         </Typography>
         <Stack>
-          <Button onClick={handleCreateAPIKey} variant="outlined">
+          <LoadingButton loading={isCreatingApiKey} onClick={handleCreateAPIKey} variant="outlined">
             Lägg till API Nyckel
-          </Button>
+          </LoadingButton>
         </Stack>
       </Stack>
       <Card>

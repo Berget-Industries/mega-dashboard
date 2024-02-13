@@ -1,6 +1,8 @@
+import React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import { useTheme } from '@mui/material/styles';
+import LoadingButton from '@mui/lab/LoadingButton';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -22,12 +24,13 @@ export default function ConfirmDialog(props: CreateAPIKeyDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { removeAPIKey } = usePostRemoveAPIKeys();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleRemoveAPIKey = async () => {
     try {
-      console.log(apiKeysId);
-      console.log(apiKeys);
+      setIsLoading(true);
       await removeAPIKey({ apiKeyId: apiKeysId });
+      setIsLoading(false);
       handleClose();
     } catch (error) {
       console.error('Error removing API key:', error);
@@ -51,12 +54,20 @@ export default function ConfirmDialog(props: CreateAPIKeyDialogProps) {
         <DialogContentText>Vill du ta bort {apiKeysId}?</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={handleCloseDialog}>
-          Avbryt
-        </Button>
-        <Button onClick={handleRemoveAPIKey} autoFocus sx={{ color: 'error.main' }}>
-          Ta bort nyckel
-        </Button>
+        <span style={{ flexGrow: 1 }}>
+          <Button variant="outlined" onClick={handleCloseDialog}>
+            Avbryt
+          </Button>
+        </span>
+        <LoadingButton
+          color="error"
+          variant="contained"
+          loading={isLoading}
+          onClick={handleRemoveAPIKey}
+          autoFocus
+        >
+          Ta bort API nyckel
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

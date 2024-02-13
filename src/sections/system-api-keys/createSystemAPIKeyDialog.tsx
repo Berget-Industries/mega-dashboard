@@ -14,6 +14,7 @@ import {
   Switch,
   FormControlLabel,
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import { usePostCreateAPIKeys } from 'src/api/organization';
 
@@ -31,6 +32,7 @@ export default function CreateSystemAPIKeyDialog({
   organization,
 }: CreateOrgDialogProps) {
   const [organizations, setOrganizations] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { createAPIKey } = usePostCreateAPIKeys();
 
@@ -41,11 +43,13 @@ export default function CreateSystemAPIKeyDialog({
     };
 
     try {
+      setIsLoading(true);
       await createAPIKey(data);
-      console.log('Användare skapades.');
-      resetForm();
     } catch (error) {
       console.error('Fel vid skapande av användare:', error);
+    } finally {
+      setIsLoading(false);
+      handleCloseDialog();
     }
   };
 
@@ -87,11 +91,19 @@ export default function CreateSystemAPIKeyDialog({
           </Select>
         </FormControl>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog}>Avbryt</Button>
-        <Button onClick={handleCreateSystemAPIKey} type="submit">
-          Lägg till
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
+        <Button variant="outlined" onClick={handleCloseDialog}>
+          Avbryt
         </Button>
+        <LoadingButton
+          loading={isLoading}
+          variant="contained"
+          color="primary"
+          onClick={handleCreateSystemAPIKey}
+          type="submit"
+        >
+          Lägg till
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

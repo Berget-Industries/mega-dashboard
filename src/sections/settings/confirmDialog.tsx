@@ -40,7 +40,12 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
         <DialogContentText>Är du säker på att du vill ta bort ett plugin?</DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'space-between' }}>
+        <Button variant="outlined" onClick={onClose}>
+          Avbryt
+        </Button>
         <LoadingButton
+          color="error"
+          variant="contained"
           loading={isLoading}
           onClick={async () => {
             setIsLoading(true);
@@ -50,9 +55,6 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
         >
           Ta bort
         </LoadingButton>
-        <Button onClick={onClose} color="error" variant="contained">
-          Avbryt
-        </Button>
       </DialogActions>
     </Dialog>
   );

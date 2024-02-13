@@ -6,6 +6,8 @@ import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
+import LinearProgress from '@mui/material/LinearProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Stack } from '@mui/system';
 import Paper from '@mui/material/Paper';
 
@@ -28,6 +30,7 @@ export default function OverviewAnalyticsView() {
   const [selectedOrg] = useSelectedOrgContext();
   const settings = useSettingsContext();
   const theme = useTheme();
+  const [togglePluginIsLoading, setTogglePluginIsLoading] = useState<string | null>(null);
 
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const { plugins, pluginsLoading, pluginsError, pluginsValidating } = useGetOrganizationPlugins({
@@ -60,8 +63,10 @@ export default function OverviewAnalyticsView() {
   }, [plugins]);
 
   const handleTogglePlugin = async (plugin: IPlugin) => {
+    setTogglePluginIsLoading(plugin._id);
     const funcToRun = plugin.isActivated ? deactivatePlugin : activatePlugin;
     await funcToRun({ pluginId: plugin._id, organizationId: selectedOrg?._id as string });
+    setTogglePluginIsLoading(null);
   };
 
   return (
@@ -126,6 +131,7 @@ export default function OverviewAnalyticsView() {
             <Paper
               variant="outlined"
               sx={{
+                overflow: 'hidden',
                 mb: 3,
                 borderColor: plugin.isActivated
                   ? theme.palette.primary.light
@@ -154,12 +160,20 @@ export default function OverviewAnalyticsView() {
                           } aktiverade sorterings regler.`}
                       </Typography>
                     </span>
-                    <Switch
-                      checked={plugin.isActivated}
-                      onClick={() => {
-                        handleTogglePlugin(plugin);
-                      }}
-                    />
+
+                    {plugin._id === togglePluginIsLoading ? (
+                      <Stack sx={{ pr: 1.5, pl: 1.5 }}>
+                        <CircularProgress size={20} thickness={5} />
+                      </Stack>
+                    ) : (
+                      <Switch
+                        checked={plugin.isActivated}
+                        onClick={() => {
+                          handleTogglePlugin(plugin);
+                        }}
+                      />
+                    )}
+
                     <IconButton
                       aria-labelledby="settings"
                       onClick={() => setOpenPluginConfigId(plugin._id)}

@@ -1,3 +1,4 @@
+import React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import { useTheme } from '@mui/material/styles';
@@ -6,6 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DialogContentText from '@mui/material/DialogContentText';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 // eslint-disable-next-line import/no-cycle
 import { usePostDeactivatePlugins } from 'src/api/organization';
@@ -24,13 +26,12 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { deactivatePlugins } = usePostDeactivatePlugins();
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleRemove = () => {
-    deactivatePlugins(organizationId, plugins);
-    handleClose();
-  };
-
-  const handleCloseDialog = () => {
+  const handleRemove = async () => {
+    setIsLoading(true);
+    await deactivatePlugins(organizationId, plugins);
+    setIsLoading(false);
     handleClose();
   };
 
@@ -39,7 +40,7 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
       fullScreen={fullScreen}
       sx={{ '& .MuiDialog-paper': { width: '30vw', maxHeight: 435 } }}
       open={open}
-      onClose={handleCloseDialog}
+      onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
     >
       <DialogTitle id="responsive-dialog-title">Är du säker?</DialogTitle>
@@ -47,12 +48,14 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
         <DialogContentText>Vill du inaktivera alla plugins för {organization}?</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={handleCloseDialog}>
-          Avbryt
-        </Button>
-        <Button onClick={handleRemove} autoFocus>
-          Inaktivera
-        </Button>
+        <span style={{ flexGrow: 1 }}>
+          <Button variant="outlined" onClick={handleClose}>
+            Avbryt
+          </Button>
+        </span>
+        <LoadingButton color="error" variant="contained" loading={isLoading} onClick={handleRemove}>
+          Inaktivera plugins
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );
