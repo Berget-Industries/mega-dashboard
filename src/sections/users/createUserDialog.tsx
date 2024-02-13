@@ -17,6 +17,7 @@ import { usePostUsers } from 'src/api/user';
 import { useGetOrganizations } from 'src/api/organization';
 import { IOrganization } from 'src/types/organization';
 import { id } from 'date-fns/locale';
+import { CustomDropdown } from 'src/components/custom-dropdown/index';
 
 interface CreateOrgDialogProps {
   open: boolean;
@@ -31,6 +32,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
   const [logoUrl, setLogoUrl] = useState('');
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedOrg, setSelectedOrg] = useState<IOrganization[]>([]);
 
   const handleCloseDialog = () => {
     setOrganizations([]);
@@ -47,7 +49,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       name: userName,
       email,
       avatarUrl: logoUrl || '',
-      organizations,
+      organizations: selectedOrg.map((org) => org._id),
     };
 
     console.log('Dina orginastioner som du vill skicka', organizations);
@@ -105,31 +107,19 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
           fullWidth
           variant="outlined"
         />
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="org-select-label">Välj en eller flera organisationer</InputLabel>
-          <Select
-            style={{ maxHeight: 300, overflowY: 'auto' }}
-            labelId="org-select-label"
-            id="org-select"
-            multiple
-            value={organizations}
-            onChange={(event) => setOrganizations(event.target.value as string[])}
-            input={<OutlinedInput label="Välj en eller flera organisationer" />}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 200,
-                },
-              },
-            }}
-          >
-            {organization.map((org) => (
-              <MenuItem key={org._id} value={org._id} sx={{ padding: '10px 16px' }}>
-                {org.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <CustomDropdown
+          value={selectedOrg.map((org) => org._id)}
+          items={(organization as IOrganization[]).map((org) => ({
+            value: org._id,
+            label: org.name,
+          }))}
+          label="Tilldela anvnändare"
+          onChange={(value) => {
+            setSelectedOrg(
+              (organization as IOrganization[]).filter((org) => value.includes(org._id))
+            );
+          }}
+        />
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'space-between' }}>
         <Button variant="outlined" onClick={handleCloseDialog}>
