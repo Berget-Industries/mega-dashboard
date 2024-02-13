@@ -19,6 +19,7 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
+  Stack,
 } from '@mui/material';
 
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
@@ -29,6 +30,7 @@ import {
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
+import { CustomDropdown } from 'src/components/custom-dropdown/index';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
 import { IUser } from 'src/types/user';
@@ -66,60 +68,25 @@ export default function OrderTableRow({ row, selected, users }: Props) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedUsers, setSelectedUsers] = React.useState<string[]>([]);
   const hasActivatedPlugins = organization.plugins.some((plugin) => plugin.isActivated);
-
-  useEffect(() => {
-    const userNames: string[] = organization.users
-      .map((userId: string) => users.find((user: IUser) => user._id === userId))
-      .filter((user: IUser | undefined): user is IUser => user !== undefined)
-      .map((user: IUser) => user.name);
-
-    setSelectedUsers(userNames);
-  }, [organization, users]);
+  const [loadingDropDownItems, setLoadingDropDownItems] = React.useState<string[]>([]);
 
   useEffect(() => {
     const userIds = organization.users;
     setSelectedUsers(userIds);
   }, [organization, users]);
 
-  const handleUserClick = async (userId: string) => {
-    const isUserSelected = selectedUsers.includes(userId);
-    if (isUserSelected) {
-      await removeUser(userId, organization.id);
-      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
-    } else {
-      await addUser(userId, organization.id);
-      if (!selectedUsers.includes(userId)) {
-        setSelectedUsers((currentSelected) => [...currentSelected, userId]);
-      }
-    }
-  };
-
-  const handleSelectUser = (event: SelectChangeEvent<typeof selectedUsers>) => {
-    const { value } = event.target;
-    setSelectedUsers(typeof value === 'string' ? value.split(',') : value);
-  };
-
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const handleToggleDialog = () => {
     setOpen(!open);
   };
 
-  const getUserNameById = (userId: string) => {
-    const user = users.find((userr) => userr._id === userId);
-    return user ? user.name : 'Okänd användare';
-  };
-
-  const renderValue = (selectedIds: string[]) => {
-    if (selectedIds.length > 1) {
-      return `${getUserNameById(selectedIds[0])}...`;
+  const onUsersChange = async (value: string[], item: string) => {
+    setLoadingDropDownItems([...loadingDropDownItems, item]);
+    if (selectedUsers.includes(item)) {
+      await removeUser(item, organization.id);
+    } else {
+      await addUser(item, organization.id);
     }
-    if (selectedIds.length === 1) {
-      return getUserNameById(selectedIds[0]);
-    }
-    return 'Välj användare';
+    setLoadingDropDownItems(loadingDropDownItems.filter((_) => _ !== item));
   };
 
   const popover = usePopover();
@@ -130,73 +97,32 @@ export default function OrderTableRow({ row, selected, users }: Props) {
         <Box>{organization.id}</Box>
       </TableCell>
 
-      <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar alt={organization.name} src={organization.logoUrl} sx={{ mr: 2 }} />
-
-        <ListItemText
-          primary={organization.name}
-          primaryTypographyProps={{ typography: 'body2' }}
-          secondaryTypographyProps={{
-            component: 'span',
-            color: 'text.disabled',
-          }}
-        />
-      </TableCell>
       <TableCell>
-        <FormControl fullWidth>
-          <Select
-            multiple
-            displayEmpty
-            value={selectedUsers}
-            onChange={handleSelectUser}
-            renderValue={() => renderValue(selectedUsers)}
-            IconComponent={ArrowDropDownIcon}
-            sx={{
-              maxHeight: '40px',
-              '.MuiSelect-select': { py: '10px', display: 'flex', alignItems: 'center' },
+        <Stack direction="row" alignItems="center">
+          <Avatar alt={organization.name} src={organization.logoUrl} sx={{ mr: 2 }} />
+
+          <ListItemText
+            primary={organization.name}
+            primaryTypographyProps={{ typography: 'body2' }}
+            secondaryTypographyProps={{
+              component: 'span',
+              color: 'text.disabled',
             }}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 200, // Ange maximal höjd för dropdown-listan här
-                  overflow: 'auto', // Aktivera rullning om innehållet överskrider maxHeight
-                },
-              },
-            }}
-          >
-            <ListSubheader>
-              <TextField
-                placeholder="Sök användare..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                variant="outlined"
-                fullWidth
-                sx={{
-                  '.MuiInputBase-root': {
-                    height: '40px',
-                    width: '100%', // Justera höjden här
-                  },
-                  '.MuiOutlinedInput-input': {
-                    padding: '10px 14px', // Minska padding för att minska höjd
-                    fontSize: '0.875rem', // Anpassa textstorlek om nödvändigt
-                  },
-                  '.MuiInputLabel-root': {
-                    transform: 'translate(14px, 12px) scale(1)', // Justera label position vid behov
-                  },
-                  '.MuiInputLabel-shrink': {
-                    transform: 'translate(14px, -6px) scale(0.75)', // Justera förminskad label position
-                  },
-                }}
-              />
-            </ListSubheader>
-            {filteredUsers.map((user) => (
-              <MenuItem key={user._id} value={user._id} onClick={() => handleUserClick(user._id)}>
-                <Checkbox checked={selectedUsers.includes(user._id)} />
-                {user.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          />
+        </Stack>
+      </TableCell>
+      <TableCell sx={{ width: '13%' }}>
+        <CustomDropdown
+          items={users.map((user) => ({
+            value: user._id,
+            label: user.name,
+            isLoading: loadingDropDownItems.includes(user._id),
+          }))}
+          onChange={onUsersChange}
+          label="Välj användare"
+          value={selectedUsers}
+          dense
+        />
       </TableCell>
 
       <TableCell sx={{ verticalAlign: 'middle' }}>

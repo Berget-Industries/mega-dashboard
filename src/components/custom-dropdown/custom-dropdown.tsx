@@ -10,11 +10,13 @@ import {
   Avatar,
   Stack,
 } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface DropdownItem {
   value: string;
   label: string;
   avatar?: string;
+  isLoading?: boolean;
 }
 
 interface DropdownItemGroup {
@@ -26,10 +28,11 @@ interface CustomDropdownProps {
   items: (DropdownItem | DropdownItemGroup)[];
   value: string[];
   label: string;
-  onChange: (value: string[]) => void;
+  onChange: (value: string[], item: string) => void;
+  dense?: boolean;
 }
 
-const CustomDropdown: FC<CustomDropdownProps> = ({ items, value, label, onChange }) => {
+const CustomDropdown: FC<CustomDropdownProps> = ({ items, value, label, onChange, dense }) => {
   const [search, setSearch] = useState('');
   const [filteredItems, setFilteredItems] = useState<(DropdownItem | DropdownItemGroup)[]>(
     items as DropdownItem[]
@@ -57,23 +60,38 @@ const CustomDropdown: FC<CustomDropdownProps> = ({ items, value, label, onChange
       event.preventDefault();
 
       if (value.includes(clickedValue)) {
-        onChange(value.filter((_) => _ !== clickedValue));
+        onChange(
+          value.filter((_) => _ !== clickedValue),
+          clickedValue
+        );
         return;
       }
 
-      onChange([...value, clickedValue]);
+      onChange([...value, clickedValue], clickedValue);
     };
 
   const renderMenyItem = (item: DropdownItem) => (
-    <MenuItem key={item.value} onClick={handleClick(item.value)} disableGutters dense>
-      <Checkbox checked={value.includes(item.value)} />
+    <MenuItem
+      key={item.value}
+      onClick={handleClick(item.value)}
+      disableGutters
+      dense
+      disabled={item.isLoading}
+    >
+      {item.isLoading ? (
+        <Stack sx={{ height: 28, width: 28 }} justifyContent="center">
+          <CircularProgress size={20} thickness={5} />
+        </Stack>
+      ) : (
+        <Checkbox checked={value.includes(item.value)} />
+      )}
       <Avatar sx={{ width: 24, height: 24, mr: 2, ml: 1 }} alt={item.label} src={item.avatar} />
       {item.label}
     </MenuItem>
   );
 
   return (
-    <FormControl fullWidth margin="normal">
+    <FormControl fullWidth margin="normal" size={dense ? 'small' : 'medium'}>
       <InputLabel id="ustom-dropdown-label">{label}</InputLabel>
 
       <Select
@@ -111,7 +129,7 @@ const CustomDropdown: FC<CustomDropdownProps> = ({ items, value, label, onChange
           <TextField
             size="small"
             id="search-field"
-            label="Search"
+            label="Sök..."
             variant="outlined"
             sx={{ flexGrow: 1, mb: 1 }}
             autoFocus={false}

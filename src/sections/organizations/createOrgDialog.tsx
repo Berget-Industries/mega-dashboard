@@ -47,12 +47,6 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
       return;
     }
 
-    const nonEmptyUsers = users.filter((user) => user.trim() !== '');
-    if (nonEmptyUsers.length === 0) {
-      alert('Minst en användare måste anges.');
-      return;
-    }
-
     try {
       await createOrganization(organizationData);
       console.log('Organisationen skapades.');
@@ -94,7 +88,7 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
             value: user._id,
             label: user.name,
           }))}
-          label="Tilldela anvnändare"
+          label="Tilldela användare"
           onChange={(value) => {
             setSelectedUsers((users as IUser[]).filter((user) => value.includes(user._id)));
           }}
