@@ -88,7 +88,7 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
             value: user._id,
             label: user.name,
           }))}
-          label="Tilldela anvnändare"
+          label="Tilldela användare"
           onChange={(value) => {
             setSelectedUsers((users as IUser[]).filter((user) => value.includes(user._id)));
           }}

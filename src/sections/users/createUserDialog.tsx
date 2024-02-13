@@ -113,7 +113,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
             value: org._id,
             label: org.name,
           }))}
-          label="Tilldela anvnändare"
+          label="Tilldela organisationer"
           onChange={(value) => {
             setSelectedOrg(
               (organization as IOrganization[]).filter((org) => value.includes(org._id))

@@ -129,7 +129,7 @@ const CustomDropdown: FC<CustomDropdownProps> = ({ items, value, label, onChange
           <TextField
             size="small"
             id="search-field"
-            label="Search"
+            label="Sök..."
             variant="outlined"
             sx={{ flexGrow: 1, mb: 1 }}
             autoFocus={false}
