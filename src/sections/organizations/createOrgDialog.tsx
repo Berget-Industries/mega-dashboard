@@ -53,6 +53,7 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
       return;
     }
 
+    try {
       await createOrganization(organizationData);
       console.log('Organisationen skapades.');
 
