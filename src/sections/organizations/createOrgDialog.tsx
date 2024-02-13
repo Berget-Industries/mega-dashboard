@@ -47,12 +47,6 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
       return;
     }
 
-    const nonEmptyUsers = users.filter((user) => user.trim() !== '');
-    if (nonEmptyUsers.length === 0) {
-      alert('Minst en användare måste anges.');
-      return;
-    }
-
     try {
       await createOrganization(organizationData);
       console.log('Organisationen skapades.');
