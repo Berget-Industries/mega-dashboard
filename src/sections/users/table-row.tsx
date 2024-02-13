@@ -68,19 +68,19 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
   const { addUser } = usePostAddUserToOrganization();
   const { removeUser } = usePostRemoveUserFromOrganization();
 
-  useEffect(() => {
-    const organizationName: string[] = user.organizations
-      .map((organizationId: string) =>
-        organization.find((organizations: IOrganization) => organizations._id === organizationId)
-      )
-      .filter(
-        (organizations: IOrganization | undefined): organizations is IOrganization =>
-          organization !== undefined
-      )
-      .map((organizations: IOrganization) => organizations.name);
+  // useEffect(() => {
+  //   const organizationName: string[] = user.organizations
+  //     .map((organizationId: string) =>
+  //       organization.find((organizations: IOrganization) => organizations._id === organizationId)
+  //     )
+  //     .filter(
+  //       (organizations: IOrganization | undefined): organizations is IOrganization =>
+  //         organization !== undefined
+  //     )
+  //     .map((organizations: IOrganization) => organizations.name);
 
-    setSelectedOrg(organizationName);
-  }, [organization, user.organizations]);
+  //   setSelectedOrg(organizationName);
+  // }, [organization, user.organizations]);
 
   useEffect(() => {
     setSelectedOrg(user.organizations);
@@ -90,35 +90,15 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
     setOpen(!open);
   };
 
-  const handleSelectOrg = (event: SelectChangeEvent<typeof selectedOrg>) => {
-    const { value } = event.target;
-    setSelectedOrg(typeof value === 'string' ? value.split(',') : value);
-  };
-
-  const renderValue = (selectedOrgIds: string[]) => {
-    if (selectedOrgIds.length > 1) {
-      const firstOrgName =
-        organization.find((org) => org._id === selectedOrgIds[0])?.name || 'Okänd organisation';
-
-      return `${firstOrgName}, ...`;
-    }
-    if (selectedOrg.length === 1) {
-      const orgName =
-        organization.find((org) => org._id === selectedOrg[0])?.name || 'Okänd organisation';
-      return orgName;
-    }
-
-    return 'Välj organisation';
-  };
-
   const handleOrgClick = async (orgId: string) => {
     const isOrgSelected = selectedOrg.includes(orgId);
     if (isOrgSelected) {
       await removeUser(user.id, orgId);
-      setSelectedOrg(selectedOrg.filter((id) => id !== orgId));
+
+      // setSelectedOrg(selectedOrg.filter((id) => id !== orgId));
     } else {
       await addUser(user.id, orgId);
-      setSelectedOrg((currentSelected) => [...currentSelected, orgId]);
+      // setSelectedOrg((currentSelected) => [...currentSelected, orgId]);
     }
   };
 
@@ -154,8 +134,15 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
             multiple
             displayEmpty
             value={selectedOrg}
-            onChange={handleSelectOrg}
-            renderValue={() => renderValue(selectedOrg)}
+            // onChange={handleSelectOrg}
+            renderValue={() =>
+              selectedOrg.length === 0
+                ? 'Välj organisation'
+                : organization
+                    .filter((org) => selectedOrg.includes(org._id))
+                    .map((org) => org.name)
+                    .join(', ')
+            }
             IconComponent={ArrowDropDownIcon}
             sx={{
               maxWidth: '200px',
@@ -202,14 +189,10 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
                 }}
               />
             </ListSubheader>
-            {filteredOrganizations.map((organizations) => (
-              <MenuItem
-                key={organizations._id}
-                value={organizations._id}
-                onClick={() => handleOrgClick(organizations._id!)}
-              >
-                <Checkbox checked={selectedOrg.includes(organizations._id!)} />
-                {organizations.name}
+            {filteredOrganizations.map((org) => (
+              <MenuItem key={org._id} value={org._id} onClick={() => handleOrgClick(org._id!)}>
+                <Checkbox checked={selectedOrg.includes(org._id!)} />
+                {org.name}
               </MenuItem>
             ))}
           </Select>
