@@ -65,7 +65,6 @@ type Props = {
 export default function OrderTableRow({ row, selected, organization }: Props) {
   const { user } = row;
   const [open, setOpen] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedOrg, setSelectedOrg] = React.useState<string[]>([]);
   const { addUser } = usePostAddUserToOrganization();
   const { removeUser } = usePostRemoveUserFromOrganization();
@@ -79,12 +78,12 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
     setOpen(!open);
   };
 
-  const onUsersChange = async (value: string[], item: string) => {
+  const onOrganizationChange = async (value: string[], item: string) => {
     setLoadingDropDownItems([...loadingDropDownItems, item]);
     if (selectedOrg.includes(item)) {
-      await removeUser(item, user.id);
+      await removeUser(user.id, item);
     } else {
-      await addUser(item, user.id);
+      await addUser(user.id, item);
     }
     setLoadingDropDownItems(loadingDropDownItems.filter((_) => _ !== item));
   };
@@ -113,14 +112,14 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
         </Stack>
       </TableCell>
 
-      <TableCell sx={{ width: '13%' }}>
+      <TableCell sx={{ width: '13%', maxWidth: '13%' }}>
         <CustomDropdown
           items={organization.map((org) => ({
             value: org._id,
             label: org.name,
             isLoading: loadingDropDownItems.includes(org._id),
           }))}
-          onChange={onUsersChange}
+          onChange={onOrganizationChange}
           label="Välj organisation"
           value={selectedOrg}
           dense
