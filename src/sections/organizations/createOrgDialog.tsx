@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -8,41 +8,36 @@ import {
   TextField,
 } from '@mui/material';
 import { usePostOrganizations } from 'src/api/organization';
+import { useGetUsers } from 'src/api/user';
+import { CustomDropdown } from 'src/components/custom-dropdown';
+import { IUser } from 'src/types/user';
 
 interface CreateOrgDialogProps {
   open: boolean;
   handleClose: () => void;
 }
 
-export default function CreateOrgDialog(props: CreateOrgDialogProps) {
-  const { open, handleClose } = props;
-  const [organizationName, setOrganizationName] = useState('');
-  const [logoUrl, setLogoUrl] = useState('');
-  const [users, setUsers] = useState<string[]>(['']);
+export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogProps) {
+  const { createOrganization } = usePostOrganizations();
+  const { users, usersLoading, usersError } = useGetUsers({});
+
+  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
+  const [organizationName, setOrganizationName] = useState<string>('');
 
   const handleCloseDialog = () => {
-    setUsers(['']);
+    setSelectedUsers([]);
     setOrganizationName('');
     setLogoUrl('');
     handleClose();
   };
-
-  const handleAddUser = () => {
-    setUsers([...users, '']);
-  };
-
-  const handleRemoveUser = (index: number) => {
-    setUsers(users.filter((_, idx) => idx !== index));
-  };
-
-  const { createOrganization } = usePostOrganizations();
 
   const handleCreateOrganization = async () => {
     const organizationData = {
       _id: '',
       name: organizationName,
       logoUrl: logoUrl || '',
-      users,
+      users: selectedUsers.map((user) => user._id),
     };
 
     if (!organizationName.trim()) {
@@ -50,19 +45,11 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       return;
     }
 
-    const nonEmptyUsers = users.filter((user) => user.trim() !== '');
-    if (nonEmptyUsers.length === 0) {
-      alert('Minst en användare måste anges.');
-      return;
-    }
-
     try {
       await createOrganization(organizationData);
       console.log('Organisationen skapades.');
 
-      setUsers(['']);
-      setOrganizationName('');
-      setLogoUrl('');
+      handleCloseDialog();
     } catch (error) {
       console.error('Fel vid skapande av organisation:', error);
     }
@@ -73,7 +60,7 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
       <DialogTitle>Lägg till organisation</DialogTitle>
       <DialogContent style={{ overflowY: 'auto' }}>
         <TextField
-          value={organizationName}
+          id={organizationName}
           onChange={(e) => setOrganizationName(e.target.value)}
           autoFocus
           required
@@ -90,29 +77,19 @@ export default function CreateOrgDialog(props: CreateOrgDialogProps) {
           fullWidth
           variant="outlined"
         />
-        {users.map((user, index) => (
-          <div key={index}>
-            <TextField
-              value={user}
-              onChange={(e) => {
-                const newUsers = [...users];
-                newUsers[index] = e.target.value;
-                setUsers(newUsers);
-              }}
-              required
-              margin="normal"
-              label={`Användare ${index + 1}`}
-              fullWidth
-              variant="outlined"
-            />
-            {users.length > 1 && (
-              <Button onClick={() => handleRemoveUser(index)}>Ta bort användare</Button>
-            )}
-          </div>
-        ))}
+        <CustomDropdown
+          value={selectedUsers.map((user) => user._id)}
+          items={(users as IUser[]).map((user) => ({
+            value: user._id,
+            label: user.name,
+          }))}
+          label="Tilldela anvnändare"
+          onChange={(value) => {
+            setSelectedUsers((users as IUser[]).filter((user) => value.includes(user._id)));
+          }}
+        />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleAddUser}>+ Lägg till användare</Button>
         <Button onClick={handleCloseDialog}>Avbryt</Button>
         <Button onClick={handleCreateOrganization} type="submit">
           Lägg till
