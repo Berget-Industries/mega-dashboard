@@ -5,6 +5,7 @@ import { GuestGuard } from 'src/auth/guard';
 import AuthClassicLayout from 'src/layouts/auth/classic';
 
 import { SplashScreen } from 'src/components/loading-screen';
+import NotFoundPage from 'src/pages/404';
 
 // ----------------------------------------------------------------------
 

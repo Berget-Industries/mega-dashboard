@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -23,8 +23,14 @@ import { PATH_AFTER_LOGIN } from 'src/config-global';
 
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import { usePostCheckIfTokenValid } from 'src/api/register';
+import NotFoundPage from 'src/pages/404';
 
 // ----------------------------------------------------------------------
+
+interface TokenValidationResponse {
+  isValid: boolean;
+}
 
 export default function JwtRegisterView() {
   const searchParams = useSearchParams();
@@ -36,9 +42,36 @@ export default function JwtRegisterView() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isTokenValid, setIsTokenValid] = useState(true);
 
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
+
+  const { checkIfTokenIsValid } = usePostCheckIfTokenValid();
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (token) {
+        try {
+          const response = await checkIfTokenIsValid(token);
+
+          const validResponse = response as TokenValidationResponse;
+
+          if (!validResponse.isValid) {
+            setIsTokenValid(false);
+          }
+        } catch (error) {
+          setIsTokenValid(false);
+        }
+      }
+    };
+
+    verifyToken();
+  }, [token, checkIfTokenIsValid]);
+
+  if (!isTokenValid) {
+    return <NotFoundPage />;
+  }
 
   const onSubmit = async () => {
     if (!token || !password || !confirmPassword) {
