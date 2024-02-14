@@ -162,11 +162,10 @@ export function usePostOrganizations() {
 }
 
 export function usePostDeactivatePlugins() {
-  const deactivatePlugins = useCallback(async (organizationId: string, plugins: IPlugin[]) => {
-    const deactivatePromises = plugins.map((plugin) =>
+  const deactivatePlugins = useCallback(async (pluginId: IPlugin[]) => {
+    const deactivatePromises = pluginId.map((plugin) =>
       poster(endpoints.admin.deactivatePlugins, {
-        organizationId,
-        name: plugin.name,
+        pluginId: plugin._id,
       })
     );
 
