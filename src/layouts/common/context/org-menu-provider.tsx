@@ -12,7 +12,7 @@ export const SelectedOrgContextProvider: FC<SelectedOrgContextProviderProps> = (
   const [selectedOrg, setSelectedOrg] = useState<IOrganization | undefined>(user?.organizations[0]);
 
   const selectOrg = useCallback(
-    (id: string) => {
+    (id: string | undefined) => {
       const foundOrg = user?.organizations.find((org: any) => org._id === id);
       setSelectedOrg(foundOrg);
     },

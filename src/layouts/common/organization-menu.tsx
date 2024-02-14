@@ -15,48 +15,32 @@ interface Organization {
 }
 
 export default function OrganizationMenu() {
+  const { user, authenticated } = useAuthContext();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedItem, setSelectedItem] = React.useState<string>('Välj organisation');
   const [selectedOrg, setSelectedOrg] = useSelectedOrgContext();
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = (org: any) => {
     setAnchorEl(null);
-    setSelectedItem(org.name);
     setSelectedOrg(org._id);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  const { user } = useAuthContext();
 
   React.useEffect(() => {
-    try {
-      const storedSelectedOrg = localStorage.getItem('selectedOrg');
-      if (storedSelectedOrg) {
-        const org: any = JSON.parse(storedSelectedOrg);
-        setSelectedItem(org.name);
-        setSelectedOrg(org._id);
-      }
-    } catch (error) {
-      console.error('Fel vid läsning från localStorage', error);
+    if (!authenticated) {
+      setSelectedOrg(undefined);
     }
-  }, [setSelectedOrg]);
-
-  React.useEffect(() => {
-    if (selectedOrg) {
-      try {
-        localStorage.setItem('selectedOrg', JSON.stringify(selectedOrg));
-        setSelectedItem(selectedOrg.name);
-      } catch (error) {
-        console.error('Fel vid sparande till localStorage', error);
-      }
+    if (!selectedOrg) {
+      setSelectedOrg(user?.organizations[0]?._id);
     }
-  }, [selectedOrg]);
+  }, [authenticated, user, selectedOrg, setSelectedOrg]);
 
   return (
     <div>
@@ -74,7 +58,9 @@ export default function OrganizationMenu() {
         variant="outlined"
       >
         <ArrowDropDownIcon />
-        <div style={{ textAlign: 'center', flex: 1 }}>{selectedItem}</div>
+        <div style={{ textAlign: 'center', flex: 1 }}>
+          {selectedOrg ? selectedOrg.name : 'Välj organisation'}
+        </div>
       </Button>
       <Menu
         id="basic-menu"
