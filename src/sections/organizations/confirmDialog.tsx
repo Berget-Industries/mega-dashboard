@@ -30,7 +30,7 @@ export default function ConfirmDialog(props: CreateOrgDialogProps) {
 
   const handleRemove = async () => {
     setIsLoading(true);
-    await deactivatePlugins(organizationId, plugins);
+    await deactivatePlugins(plugins);
     setIsLoading(false);
     handleClose();
   };
