@@ -1,36 +1,18 @@
 import * as Yup from 'yup';
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 
-import Link from '@mui/material/Link';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
-import InputAdornment from '@mui/material/InputAdornment';
 import { TextField, FormControl } from '@mui/material';
 
-import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
 import { useRouter, useSearchParams } from 'src/routes/hooks';
-
-import { useBoolean } from 'src/hooks/use-boolean';
 
 import { useAuthContext } from 'src/auth/hooks';
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 
-import Iconify from 'src/components/iconify';
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import { usePostCheckIfTokenValid } from 'src/api/register';
-import NotFoundPage from 'src/pages/404';
-
 // ----------------------------------------------------------------------
-
-interface TokenValidationResponse {
-  isValid: boolean;
-}
 
 export default function JwtRegisterView() {
   const searchParams = useSearchParams();
@@ -42,36 +24,9 @@ export default function JwtRegisterView() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [isTokenValid, setIsTokenValid] = useState(true);
 
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-
-  const { checkIfTokenIsValid } = usePostCheckIfTokenValid();
-
-  useEffect(() => {
-    const verifyToken = async () => {
-      if (token) {
-        try {
-          const response = await checkIfTokenIsValid(token);
-
-          const validResponse = response as TokenValidationResponse;
-
-          if (!validResponse.isValid) {
-            setIsTokenValid(false);
-          }
-        } catch (error) {
-          setIsTokenValid(false);
-        }
-      }
-    };
-
-    verifyToken();
-  }, [token, checkIfTokenIsValid]);
-
-  if (!isTokenValid) {
-    return <NotFoundPage />;
-  }
 
   const onSubmit = async () => {
     if (!token || !password || !confirmPassword) {
