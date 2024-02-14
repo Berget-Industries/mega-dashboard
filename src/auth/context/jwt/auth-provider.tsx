@@ -186,6 +186,15 @@ export function AuthProvider({ children }: Props) {
     });
   }, []);
 
+  const resetPassword = useCallback(async (token: string, newPassword: string) => {
+    const data = {
+      token,
+      newPassword,
+    };
+
+    await axios.post(endpoints.auth.resetPasswordWithToken, data);
+  }, []);
+
   // ----------------------------------------------------------------------
 
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
@@ -203,8 +212,9 @@ export function AuthProvider({ children }: Props) {
       login,
       register,
       logout,
+      resetPassword,
     }),
-    [login, logout, register, state.user, status]
+    [login, logout, register, resetPassword, state.user, status]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

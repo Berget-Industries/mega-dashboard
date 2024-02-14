@@ -43,6 +43,8 @@ export const endpoints = {
     me: '/api/auth/me',
     login: '/api/auth/login',
     register: '/api/auth/register',
+    resetPasswordWithToken: '/api/auth/resetPasswordWithToken',
+    requestResetPasswordToken: '/api/auth/requestResetPasswordToken',
   },
   organization: {
     get: '/api/dashboard/get',
