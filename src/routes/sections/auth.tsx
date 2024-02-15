@@ -5,6 +5,7 @@ import { GuestGuard } from 'src/auth/guard';
 import AuthClassicLayout from 'src/layouts/auth/classic';
 
 import { SplashScreen } from 'src/components/loading-screen';
+import TokenValidationGuard from 'src/components/token-validation-guard/token-validation-guard';
 
 // ----------------------------------------------------------------------
 
@@ -13,6 +14,14 @@ const JwtLoginPage = lazy(() => import('src/pages/auth/jwt/login'));
 const JwtRegisterPage = lazy(() => import('src/pages/auth/jwt/register'));
 
 // ----------------------------------------------------------------------
+
+const JwtRegisterPageWithValidation = () => (
+  <TokenValidationGuard>
+    <AuthClassicLayout>
+      <JwtRegisterPage />
+    </AuthClassicLayout>
+  </TokenValidationGuard>
+);
 
 const authJwt = {
   path: 'jwt',
@@ -34,11 +43,7 @@ const authJwt = {
     },
     {
       path: 'register',
-      element: (
-        <AuthClassicLayout title="Manage the job more effectively with Minimal">
-          <JwtRegisterPage />
-        </AuthClassicLayout>
-      ),
+      element: <JwtRegisterPageWithValidation />,
     },
   ],
 };

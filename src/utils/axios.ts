@@ -23,7 +23,7 @@ export const fetcher = async (args: string | [string, AxiosRequestConfig]) => {
   return res.data;
 };
 
-export const poster = async <T>(url: string, data: object): Promise<T> => {
+export const poster = async <T>(url: string, data: object | string): Promise<T> => {
   console.log('Posting data to URL:', url);
   try {
     const res = await axiosInstance.post<T>(url, data);
@@ -45,6 +45,7 @@ export const endpoints = {
     register: '/api/auth/register',
     resetPasswordWithToken: '/api/auth/resetPasswordWithToken',
     requestResetPasswordToken: '/api/auth/requestResetPasswordToken',
+    checkIfTokenIsValid: '/api/auth/check-reset-password-token',
   },
   organization: {
     get: '/api/dashboard/get',
