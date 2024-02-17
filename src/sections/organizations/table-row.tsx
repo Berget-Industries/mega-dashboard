@@ -20,6 +20,7 @@ import {
   SelectChangeEvent,
   TextField,
   Stack,
+  CircularProgress,
 } from '@mui/material';
 
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
@@ -53,7 +54,7 @@ export interface IOrganizationTableRow {
   };
 }
 
-export interface IOrganizationData {
+interface IOrganizationData {
   exportData: {
     organization: {
       name: string;
@@ -82,11 +83,12 @@ export default function OrderTableRow({ row, selected, users }: Props) {
   const [loadingDropDownItems, setLoadingDropDownItems] = React.useState<string[]>([]);
   const [exportRequested, setExportRequested] = React.useState(false);
   const [currentExportOrgId, setCurrentExportOrgId] = React.useState<string | null>(null);
-  const { organizationData } = useGetExportOrganization({
+  const { organizationData, isLoading } = useGetExportOrganization({
     organizationId: currentExportOrgId,
   });
 
   const exportOrganizationData = (data: IOrganizationData) => {
+    console.log('Exporting organization data:', data);
     const { exportData } = data;
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -94,7 +96,7 @@ export default function OrderTableRow({ row, selected, users }: Props) {
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${data.exportData.organization.name}-data.json`;
+    link.download = `${data?.exportData?.organization?.name}-data.json`;
     document.body.appendChild(link);
     link.click();
 
@@ -105,13 +107,12 @@ export default function OrderTableRow({ row, selected, users }: Props) {
   };
 
   useEffect(() => {
-    if (exportRequested && organizationData) {
-      console.log('Exporting organization data:', organizationData);
+    if (!isLoading && exportRequested && organizationData) {
       exportOrganizationData(organizationData);
       setExportRequested(false);
       setCurrentExportOrgId(null);
     }
-  }, [exportRequested, organizationData]);
+  }, [isLoading, exportRequested, organizationData]);
 
   const handleExportClick = () => {
     setExportRequested(true);
