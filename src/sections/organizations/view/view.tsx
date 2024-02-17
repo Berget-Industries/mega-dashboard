@@ -10,15 +10,10 @@ import OrganizationTable from '../org-table';
 export default function OverviewOrganisationView() {
   const { organizations, organizationsLoading, organizationsError } = useGetOrganizations({});
   const { users, usersLoading, usersError } = useGetUsers({});
-  const { organizationData } = useGetExportOrganization({});
 
   return (
     <Container maxWidth="xl">
-      <OrganizationTable
-        organizations={organizations}
-        users={users}
-        organizationData={organizationData}
-      />
+      <OrganizationTable organizations={organizations} users={users} />
     </Container>
   );
 }

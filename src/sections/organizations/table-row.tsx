@@ -39,8 +39,6 @@ import { IOrganization, IPlugin } from 'src/types/organization';
 
 // eslint-disable-next-line import/no-cycle
 import ConfirmDialog from './confirmDialog';
-// eslint-disable-next-line import/no-cycle
-import { IOrganizationData } from './org-table';
 
 // ----------------------------------------------------------------------
 
@@ -55,14 +53,23 @@ export interface IOrganizationTableRow {
   };
 }
 
+export interface IOrganizationData {
+  exportData: {
+    organization: {
+      name: string;
+      logoUrl: string;
+    };
+    plugins: IPlugin[];
+  };
+}
+
 type Props = {
   row: IOrganizationTableRow;
   selected: boolean;
   users: IUser[];
-  organizationDataa: IOrganizationData;
 };
 
-export default function OrderTableRow({ row, selected, users, organizationDataa }: Props) {
+export default function OrderTableRow({ row, selected, users }: Props) {
   const navigate = useNavigate();
   const [selectedOrg, selectOrg] = useSelectedOrgContext();
   const { organization } = row;
@@ -80,20 +87,21 @@ export default function OrderTableRow({ row, selected, users, organizationDataa 
   });
 
   const exportOrganizationData = (data: IOrganizationData) => {
-    console.log('Data to export:', data);
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const { exportData } = data;
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${data}-data.json`;
+    link.download = `${data.exportData.organization.name}-data.json`;
     document.body.appendChild(link);
     link.click();
 
     setTimeout(() => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    }, 100); // Liten fördröjning innan rensning
+    }, 100);
   };
 
   useEffect(() => {

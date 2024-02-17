@@ -40,13 +40,6 @@ import OrderTableRow, { IOrganizationTableRow } from './table-row';
 interface OrganizationTableProps {
   organizations: IOrganization[];
   users: IUser[];
-  organizationData: IOrganizationData;
-}
-
-export interface IOrganizationData {
-  id: string;
-  name: string;
-  plugins: IPlugin[];
 }
 
 // ----------------------------------------------------------------------
@@ -103,11 +96,7 @@ function applyFilter({
 
 // ----------------------------------------------------------------------
 
-export default function OrganizationTable({
-  organizations,
-  users,
-  organizationData,
-}: OrganizationTableProps) {
+export default function OrganizationTable({ organizations, users }: OrganizationTableProps) {
   const table = useTable({ defaultOrderBy: 'date' });
   const confirm = useBoolean();
   const [tableData, setTableData] = useState<IOrganizationTableRow[]>([]);
@@ -238,7 +227,6 @@ export default function OrganizationTable({
                       row={row}
                       selected={table.selected.includes(row.id)}
                       users={users}
-                      organizationDataa={organizationData}
                     />
                   ))}
                 <TableEmptyRows
