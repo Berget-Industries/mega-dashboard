@@ -175,6 +175,14 @@ export default function OrderTableRow({ row, selected, users }: Props) {
         <MenuItem
           onClick={() => {
             popover.onClose();
+          }}
+        >
+          <Iconify icon="ph:export" />
+          Exportera organisation
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            popover.onClose();
             setOpen(true);
           }}
           sx={{ color: 'error.main' }}
