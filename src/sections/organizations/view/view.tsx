@@ -1,7 +1,7 @@
 import Container from '@mui/material/Container';
 
 import { useGetUsers } from 'src/api/user';
-import { useGetOrganizations } from 'src/api/organization';
+import { useGetExportOrganization, useGetOrganizations } from 'src/api/organization';
 
 import OrganizationTable from '../org-table';
 

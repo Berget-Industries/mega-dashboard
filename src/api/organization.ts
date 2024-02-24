@@ -365,3 +365,24 @@ export function usePostRemoveUserFromOrganization() {
 
   return { removeUser };
 }
+
+export function useGetExportOrganization({ organizationId }: { organizationId?: string | null }) {
+  const URL = organizationId
+    ? `${endpoints.admin.exportOrganization}?organization=${organizationId}`
+    : `${endpoints.admin.exportOrganization}`;
+  console.log('Request URL:', URL);
+
+  const { data, isLoading, error, isValidating } = useSWR(organizationId ? URL : null, fetcher);
+
+  const memoizedValue = useMemo(
+    () => ({
+      organizationData: data || [],
+      isLoading,
+      error,
+      isValidating,
+    }),
+    [data, isLoading, error, isValidating]
+  );
+
+  return memoizedValue;
+}

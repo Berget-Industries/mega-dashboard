@@ -27,11 +27,12 @@ import {
 import OrderTableFiltersResult from 'src/sections/tickets/order-table-filters-result';
 
 import { IUser } from 'src/types/user';
-import { IOrganization } from 'src/types/organization';
+import { IOrganization, IPlugin } from 'src/types/organization';
 import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
 
 import CreateOrgDialog from './createOrgDialog';
 import FilterOrganisationBar from './filter-org-bar';
+// eslint-disable-next-line import/no-cycle
 import OrderTableRow, { IOrganizationTableRow } from './table-row';
 
 // ----------------------------------------------------------------------

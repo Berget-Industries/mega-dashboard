@@ -20,10 +20,12 @@ import {
   SelectChangeEvent,
   TextField,
   Stack,
+  CircularProgress,
 } from '@mui/material';
 
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 import {
+  useGetExportOrganization,
   usePostAddUserToOrganization,
   usePostRemoveUserFromOrganization,
 } from 'src/api/organization';
@@ -52,6 +54,16 @@ export interface IOrganizationTableRow {
   };
 }
 
+interface IOrganizationData {
+  exportData: {
+    organization: {
+      name: string;
+      logoUrl: string;
+    };
+    plugins: IPlugin[];
+  };
+}
+
 type Props = {
   row: IOrganizationTableRow;
   selected: boolean;
@@ -69,6 +81,43 @@ export default function OrderTableRow({ row, selected, users }: Props) {
   const [selectedUsers, setSelectedUsers] = React.useState<string[]>([]);
   const hasActivatedPlugins = organization.plugins.some((plugin) => plugin.isActivated);
   const [loadingDropDownItems, setLoadingDropDownItems] = React.useState<string[]>([]);
+  const [exportRequested, setExportRequested] = React.useState(false);
+  const [currentExportOrgId, setCurrentExportOrgId] = React.useState<string | null>(null);
+  const { organizationData, isLoading } = useGetExportOrganization({
+    organizationId: currentExportOrgId,
+  });
+
+  const exportOrganizationData = (data: IOrganizationData) => {
+    console.log('Exporting organization data:', data);
+    const { exportData } = data;
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${data?.exportData?.organization?.name}-data.json`;
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (!isLoading && exportRequested && organizationData) {
+      exportOrganizationData(organizationData);
+      setExportRequested(false);
+      setCurrentExportOrgId(null);
+    }
+  }, [isLoading, exportRequested, organizationData]);
+
+  const handleExportClick = () => {
+    setExportRequested(true);
+    setCurrentExportOrgId(organization.id);
+  };
 
   useEffect(() => {
     const userIds = organization.users;
@@ -171,6 +220,15 @@ export default function OrderTableRow({ row, selected, users }: Props) {
         >
           <Iconify icon="mdi:plug" />
           Visa plugins
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            popover.onClose();
+            handleExportClick();
+          }}
+        >
+          <Iconify icon="ph:export" />
+          Exportera organisation
         </MenuItem>
         <MenuItem
           onClick={() => {
