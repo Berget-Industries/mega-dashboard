@@ -3,8 +3,8 @@ import React from 'react';
 import { Box } from '@mui/material'; // Använder MUI Box för att omsluta SVG:n
 
 const TwoStack: React.FC = () => (
-  <Box>
-    <svg width="51" height="49" viewBox="0 0 51 49" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <Box sx={{ position: 'absolute', m: { xs: 2, md: 5 } }}>
+    <svg width="85" height="85" viewBox="0 0 51 49" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d_40_269)">
         <path
           d="M38.6014 17.1579C41.7034 19.5441 40.9853 24.4081 37.3261 25.796L26.8501 29.7697C25.2282 30.3849 23.4033 30.1155 22.0283 29.0578L12.0998 21.4205C8.99772 19.0343 9.71581 14.1703 13.375 12.7824L23.851 8.80871C25.473 8.19349 27.2979 8.46291 28.6728 9.52057L38.6014 17.1579Z"
