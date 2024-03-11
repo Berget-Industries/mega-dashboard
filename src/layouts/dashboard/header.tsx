@@ -11,6 +11,7 @@ import { bgBlur } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import SvgColor from 'src/components/svg-color';
+import TwoStack from 'src/components/logo/twostacklogo';
 import { useSettingsContext } from 'src/components/settings';
 
 import Searchbar from '../common/searchbar';
@@ -19,8 +20,8 @@ import SettingsButton from '../common/settings-button';
 import AccountPopover from '../common/account-popover';
 import ContactsPopover from '../common/contacts-popover';
 import LanguagePopover from '../common/language-popover';
-import NotificationsPopover from '../common/notifications-popover';
 import OrganizationMenu from '../common/organization-menu';
+import NotificationsPopover from '../common/notifications-popover';
 
 // ----------------------------------------------------------------------
 
@@ -45,7 +46,7 @@ export default function Header({ onOpenNav }: Props) {
 
   const renderContent = (
     <>
-      {lgUp && isNavHorizontal && <Logo sx={{ mr: 2.5 }} />}
+      {lgUp && isNavHorizontal && <TwoStack sx={{ mr: 2.5 }} />}
 
       {!lgUp && (
         <IconButton onClick={onOpenNav}>

@@ -24,14 +24,13 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
   const mdUp = useResponsive('up', 'md');
 
   const renderLogo = (
-    // <Logo
-    //   sx={{
-    //     zIndex: 9,
-    //     position: 'absolute',
-    //     m: { xs: 2, md: 5 },
-    //   }}
-    // />
-    <TwoStack />
+    <TwoStack
+      sx={{
+        zIndex: 9,
+        position: 'absolute',
+        m: { xs: 2, md: 5 },
+      }}
+    />
   );
 
   const renderContent = (
