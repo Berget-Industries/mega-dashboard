@@ -53,7 +53,7 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
         },
       }}
     >
-      <TwoStack sx={{ mt: 2, ml: 4, mb: 1 }} />
+      <TwoStack sx={{ mt: -5, ml: 4, mb: 8 }} />
 
       <NavSectionVertical
         data={navData}
