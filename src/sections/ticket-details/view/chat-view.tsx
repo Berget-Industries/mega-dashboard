@@ -72,14 +72,14 @@ export default function ChatView() {
                 contentType: 'html',
                 attachments: [],
               },
-              {
-                id: `${_._id}==${_.llmOutput[1].name}`,
-                body: _.llmOutput[1].output,
+              ..._.llmOutput.map((llmOutput) => ({
+                id: `${_._id}==${llmOutput.name}`,
+                body: llmOutput.output,
                 createdAt: _.createdAt,
-                senderId: _.llmOutput[1].name,
+                senderId: llmOutput.name,
                 contentType: 'html',
                 attachments: [],
-              },
+              })),
             ])
             .flat()}
           participants={[
@@ -91,9 +91,23 @@ export default function ChatView() {
               phoneNumber: conversation.contact.phoneNumber,
             },
             {
-              id: 'eva',
+              id: 'mega-assistant-alex',
+              name: 'Alex',
+              email: '',
+              avatarUrl: '',
+              phoneNumber: '',
+            },
+            {
+              id: 'mega-assistant-eva',
               name: 'Eva',
-              email: 'reservation@trattorian.se',
+              email: '',
+              avatarUrl: '',
+              phoneNumber: '',
+            },
+            {
+              id: 'auto-filter',
+              name: 'AutoFilter',
+              email: '',
               avatarUrl: '',
               phoneNumber: '',
             },

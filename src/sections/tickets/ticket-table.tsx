@@ -110,7 +110,9 @@ export default function TicketsTable({ conversations }: ITicketTable) {
       type: _.messages
         .map((message) =>
           message.llmOutput
-            .map((llmOuput) => llmOuput.actions.map((action) => action.type).flat())
+            .map((llmOuput) =>
+              llmOuput?.actions ? llmOuput.actions.map((action) => action.type).flat() : []
+            )
             .flat()
         )
         .flat(),

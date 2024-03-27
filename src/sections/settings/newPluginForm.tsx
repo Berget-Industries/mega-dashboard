@@ -547,6 +547,54 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
             />
           </>
         )}
+
+        {/*
+            OBS
+            INPUTS FÖR
+            MEGA ASSISTANT - mailE
+            OBS
+          */}
+
+        {defaultPlugin?.name === 'mega-assistant-alex-mailE-sendToHuman' && (
+          <>
+            <Typography variant="h6" color="text.secondary">
+              Kontakuppgifter till människa.
+            </Typography>
+
+            <TextField
+              id="_mailESendTo"
+              label="Mottagare"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.sendTo || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  sendTo: event.target.value,
+                });
+              }}
+            />
+            <TextField
+              id="_mailESubject"
+              label="Ämne"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.subject || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
+              }}
+            />
+          </>
+        )}
       </DialogContent>
       <DialogActions>
         <span style={{ flexGrow: 1 }}>

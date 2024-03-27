@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import moment from 'moment';
 
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
@@ -8,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
 import LinearProgress from '@mui/material/LinearProgress';
 import CircularProgress from '@mui/material/CircularProgress';
+import LanIcon from '@mui/icons-material/Lan';
 import { Stack } from '@mui/system';
 import Paper from '@mui/material/Paper';
 
@@ -22,6 +24,27 @@ import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-conte
 import FormDialog from './formDialog';
 import NewPluginFrom from './newPluginForm';
 import ConfirmDialog from './confirmDialog';
+
+moment.updateLocale('sv', {
+  relativeTime: {
+    future: 'om %s',
+    past: 'för %s sedan',
+    s: 'några sekunder',
+    ss: '%d sekunder',
+    m: 'en minut',
+    mm: '%d minuter',
+    h: 'en timme',
+    hh: '%d timmar',
+    d: 'en dag',
+    dd: '%d dagar',
+    w: 'en vecka',
+    ww: '%d veckor',
+    M: 'en månad',
+    MM: '%d månader',
+    y: 'ett år',
+    yy: '%d år',
+  },
+});
 
 // ----------------------------------------------------------------------
 
@@ -143,13 +166,19 @@ export default function OverviewAnalyticsView() {
                   <Stack direction="row" alignItems="center">
                     <span style={{ flexGrow: 1 }}>
                       <Typography variant="h5">{plugin.name}</Typography>
+
                       <Typography variant="body1" color="text.secondary">
                         {plugin.name === 'mailer' && (
                           <Stack direction="column" justifyContent="center">
                             <span>
+                              Status: {plugin.worker ? `Online (${plugin.worker})` : 'Offline'}
+                            </span>
+                            <span>Senaste hearbeat {moment(plugin.lastHeartbeat).fromNow()}.</span>
+                            <span>
                               Auto Filter: {plugin.config.autoFilter ? 'Aktiv' : 'Inaktiv'}
                             </span>
                             <span>Address: {plugin.config.imapConfig?.user}</span>
+                            {/* {plugin.worker && <span>Worker: {plugin.worker}</span>} */}
                           </Stack>
                         )}
                         {plugin.name === 'mega-assistant-alex' && plugin.config.plugins.join(', ')}
