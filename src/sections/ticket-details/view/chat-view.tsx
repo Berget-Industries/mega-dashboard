@@ -72,17 +72,14 @@ export default function ChatView() {
                 contentType: 'html',
                 attachments: [],
               },
-
-              ..._.llmOutput
-                // .filter((__) => __.name !== 'chain-starter')
-                .map((__) => ({
-                  id: `${_._id}==${__.name}`,
-                  body: __.output,
-                  createdAt: _.createdAt,
-                  senderId: __.name,
-                  contentType: 'html',
-                  attachments: [],
-                })),
+              ..._.llmOutput.map((llmOutput) => ({
+                id: `${_._id}==${llmOutput.name}`,
+                body: llmOutput.output,
+                createdAt: _.createdAt,
+                senderId: llmOutput.name,
+                contentType: 'html',
+                attachments: [],
+              })),
             ])
             .flat()}
           participants={[

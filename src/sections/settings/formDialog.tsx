@@ -9,7 +9,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { IPlugin } from 'src/types/organization';
 import { Container, Stack } from '@mui/system';
-import { Typography, Switch, Grid } from '@mui/material';
+import { Typography, Switch, Grid, Divider } from '@mui/material';
 import { usePlugin } from 'src/api/organization';
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
@@ -64,7 +64,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
       <DialogTitle>Ändra konfig</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Här byter du konfig till de som passar din organisation!
+          Här byter du konfig till de som passar din organasdasdisation!
         </DialogContentText>
 
         {/*
@@ -300,7 +300,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
           <>
             <TextField
               id="_imapUsername"
-              label="IMAP Username"
+              label="Username"
               margin="normal"
               variant="outlined"
               required
@@ -317,7 +317,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
 
             <TextField
               id="_imapPassword"
-              label="IMAP Passwrord"
+              label="Passwrord"
               margin="normal"
               variant="outlined"
               required
@@ -332,6 +332,12 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 });
               }}
             />
+
+            <Divider sx={{ mt: 4, mb: 4 }} />
+
+            <Typography sx={{ p: 1 }} variant="h6" color="text.secondary">
+              IMAP Server
+            </Typography>
 
             <TextField
               id="_imapHost"
@@ -362,14 +368,14 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 event.preventDefault();
                 setPluginConfig({
                   ...pluginConfig,
-                  imapConfig: { ...pluginConfig.imapConfig, port: event.target.value },
+                  imapConfig: { ...pluginConfig.imapConfig, port: Number(event.target.value) },
                 });
               }}
             />
 
             <Stack spacing={2} justifyContent="space-between" alignItems="center" direction="row">
-              <Typography sx={{ p: 1 }} variant="h6" color="text.secondary">
-                TLS
+              <Typography sx={{ p: 1 }} variant="body1" color="text.secondary">
+                IMAP Secure
               </Typography>
               <Switch
                 checked={pluginConfig.imapConfig?.tls || false}
@@ -388,6 +394,73 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 }}
               />
             </Stack>
+
+            <Divider sx={{ mt: 4, mb: 4 }} />
+
+            <Typography sx={{ p: 1 }} variant="h6" color="text.secondary">
+              SMTP Server
+            </Typography>
+
+            <TextField
+              id="_smtpHost"
+              label="SMTP Host"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.nodemailerConfig?.host || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  nodemailerConfig: { ...pluginConfig.nodemailerConfig, host: event.target.value },
+                });
+              }}
+            />
+
+            <TextField
+              id="_smtpPort"
+              label="SMTP Port"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.nodemailerConfig?.port || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  nodemailerConfig: {
+                    ...pluginConfig.nodemailerConfig,
+                    port: Number(event.target.value),
+                  },
+                });
+              }}
+            />
+
+            <Stack spacing={2} justifyContent="space-between" alignItems="center" direction="row">
+              <Typography sx={{ p: 1 }} variant="body1" color="text.secondary">
+                SMTP Secure
+              </Typography>
+              <Switch
+                checked={pluginConfig.nodemailerConfig?.secure || false}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setPluginConfig({
+                    ...pluginConfig,
+                    nodemailerConfig: {
+                      ...pluginConfig.nodemailerConfig,
+                      secure:
+                        pluginConfig.nodemailerConfig !== undefined
+                          ? !pluginConfig.nodemailerConfig.secure
+                          : false,
+                    },
+                  });
+                }}
+              />
+            </Stack>
+
+            <Divider sx={{ mt: 4, mb: 4 }} />
 
             <Stack spacing={2} justifyContent="space-between" alignItems="center" direction="row">
               <Typography sx={{ p: 1 }} variant="h6" color="text.secondary">
@@ -482,6 +555,54 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
               onChange={(event) => {
                 event.preventDefault();
                 setPluginConfig({ ...pluginConfig, apiKey: event.target.value });
+              }}
+            />
+          </>
+        )}
+
+        {/*
+            OBS
+            INPUTS FÖR
+            MEGA ASSISTANT - mailE
+            OBS
+          */}
+
+        {plugin.name === 'mega-assistant-alex-mailE-sendToHuman' && (
+          <>
+            <Typography variant="h6" color="text.secondary">
+              Kontakuppgifter till människa.
+            </Typography>
+
+            <TextField
+              id="_mailESendTo"
+              label="MailE Skicka till"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.sendTo || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  sendTo: event.target.value,
+                });
+              }}
+            />
+            <TextField
+              id="_mailESubject"
+              label="MailE Ämne"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.subject || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
               }}
             />
           </>
