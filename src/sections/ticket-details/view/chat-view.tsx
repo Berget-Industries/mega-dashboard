@@ -72,14 +72,17 @@ export default function ChatView() {
                 contentType: 'html',
                 attachments: [],
               },
-              {
-                id: `${_._id}==${_.llmOutput[1].name}`,
-                body: _.llmOutput[1].output,
-                createdAt: _.createdAt,
-                senderId: _.llmOutput[1].name,
-                contentType: 'html',
-                attachments: [],
-              },
+
+              ..._.llmOutput
+                // .filter((__) => __.name !== 'chain-starter')
+                .map((__) => ({
+                  id: `${_._id}==${__.name}`,
+                  body: __.output,
+                  createdAt: _.createdAt,
+                  senderId: __.name,
+                  contentType: 'html',
+                  attachments: [],
+                })),
             ])
             .flat()}
           participants={[
@@ -91,9 +94,37 @@ export default function ChatView() {
               phoneNumber: conversation.contact.phoneNumber,
             },
             {
-              id: 'eva',
+              name: 'Auto-Filter',
+              id: 'auto-filter',
+              email: '',
+              avatarUrl: '',
+              phoneNumber: '',
+            },
+            {
+              id: 'mega-assistant-alex',
+              name: 'ssss',
+              email: '',
+              avatarUrl: '',
+              phoneNumber: '',
+            },
+            {
+              id: 'mega-assistant-eva',
               name: 'Eva',
-              email: 'reservation@trattorian.se',
+              email: '',
+              avatarUrl: '',
+              phoneNumber: '',
+            },
+            {
+              id: 'chain-starter',
+              name: 'Alex-OutReach',
+              email: '',
+              avatarUrl: '',
+              phoneNumber: '',
+            },
+            {
+              name: 'Mail-Subjector',
+              id: 'mail-subjector',
+              email: '',
               avatarUrl: '',
               phoneNumber: '',
             },
