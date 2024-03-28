@@ -367,6 +367,45 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
         {/*
             OBS
             INPUTS FÖR
+            CHAIN - STARTER
+            OBS
+         */}
+        {defaultPlugin?.name === 'chain-starter' && (
+          <>
+            <TextField
+              id="_systemPrompt"
+              label="System Prompt"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              multiline
+              value={pluginConfig.systemPrompt || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({ ...pluginConfig, systemPrompt: event.target.value });
+              }}
+            />
+
+            <TextField
+              id="_signature"
+              label="Signatur"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.signature || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({ ...pluginConfig, signature: event.target.value });
+              }}
+            />
+          </>
+        )}
+
+        {/*
+            OBS
+            INPUTS FÖR
             MEGA MAILER
             OBS
          */}
