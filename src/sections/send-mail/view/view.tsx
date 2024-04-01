@@ -35,6 +35,7 @@ export default function SendMail() {
     name: string;
     description: string;
   } | null>(null);
+
   const removePreset = (presetToRemove: string) => {
     setPresets(presets.filter((preset) => preset.name !== presetToRemove));
   };
@@ -124,12 +125,27 @@ export default function SendMail() {
           <Select
             labelId="instruction-label"
             value={presetName}
-            onChange={(e) => setPresetName(e.target.value)}
+            onChange={(e) => {
+              const newName = e.target.value;
+              const selectedPresett = presets.find((preset) => preset.name === newName);
+              setPresetName(newName);
+              if (selectedPresett) {
+                setInstruction(selectedPresett.description);
+              } else {
+                setInstruction('');
+              }
+            }}
             input={<OutlinedInput label="Välj en preset" />}
             renderValue={(selected) =>
               presets.find((preset) => preset.name === selected)?.name || ''
             }
             MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  maxWidth: 300,
+                },
+              },
               MenuListProps: {
                 subheader: (
                   <ListSubheader
@@ -232,6 +248,7 @@ export default function SendMail() {
         setPresetName={setPresetName}
         onRemove={removePreset}
         setPresets={setPresets}
+        presets={presets}
       />
     </Container>
   );

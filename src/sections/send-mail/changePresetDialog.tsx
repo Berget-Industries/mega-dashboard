@@ -15,6 +15,7 @@ interface CreateOrgDialogProps {
   setPresetName: (presetName: string) => void;
   onRemove: (presetName: string) => void;
   setPresets: (options: { name: string; description: string }[]) => void;
+  presets: { name: string; description: string }[];
 }
 
 export default function ChangePresetDialog(props: CreateOrgDialogProps) {
@@ -27,9 +28,8 @@ export default function ChangePresetDialog(props: CreateOrgDialogProps) {
     setPresetName,
     onRemove,
     setPresets,
+    presets,
   } = props;
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleRemovePreset = () => {
     console.log('Remove preset');
@@ -38,15 +38,21 @@ export default function ChangePresetDialog(props: CreateOrgDialogProps) {
   };
 
   const handleChangePreset = () => {
-    const changePreset = { name: presetName, description: instruction };
-    setPresets([changePreset]);
+    const updatedPreset = { name: presetName, description: instruction };
+    const updatedPresets = presets.map((preset) => {
+      if (preset.name === presetName) {
+        return updatedPreset;
+      }
+      return preset;
+    });
+    setPresets(updatedPresets);
     onClose();
   };
 
   return (
     <Dialog
-      fullScreen={fullScreen}
-      sx={{ '& .MuiDialog-paper': { width: '30vw', maxHeight: 435 } }}
+      maxWidth="sm"
+      fullWidth
       open={open}
       onClose={onClose}
       aria-labelledby="responsive-dialog-title"

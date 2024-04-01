@@ -30,8 +30,6 @@ export default function AddPresetDialog(props: AddPresetProps) {
     presetName,
     setPresetName,
   } = props;
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleAddPreset = () => {
     const newPreset = { name: presetName, description: instruction };
@@ -41,13 +39,13 @@ export default function AddPresetDialog(props: AddPresetProps) {
 
   return (
     <Dialog
-      fullScreen={fullScreen}
-      sx={{ '& .MuiDialog-paper': { width: '30vw', maxHeight: 435 } }}
+      maxWidth="sm"
+      fullWidth
       open={open}
       onClose={onClose}
-      aria-labelledby="responsive-dialog-title"
+      // aria-labelledby="responsive-dialog-title"
     >
-      <DialogTitle id="responsive-dialog-title">Lägg till en preset.</DialogTitle>
+      <DialogTitle id="responsive-dialog-title">Lägg till en preset</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Här kan du lägga till en preset till när du ska skicka ett mail.
@@ -65,8 +63,8 @@ export default function AddPresetDialog(props: AddPresetProps) {
           label="Skriv din preset här."
           fullWidth
           multiline
-          rows={4}
-          sx={{ mb: 3, mt: 3 }}
+          rows={7}
+          // sx={{ mb: 3 }}
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
         />
