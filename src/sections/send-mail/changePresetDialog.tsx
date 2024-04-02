@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Stack, Container, TextField, DialogContent, DialogContentText } from '@mui/material';
 
-interface CreateOrgDialogProps {
+interface ChangePresetProps {
   open: boolean;
   onClose: () => void;
   instruction: string;
@@ -18,7 +18,7 @@ interface CreateOrgDialogProps {
   presets: { name: string; description: string }[];
 }
 
-export default function ChangePresetDialog(props: CreateOrgDialogProps) {
+export default function ChangePresetDialog(props: ChangePresetProps) {
   const {
     open,
     onClose,
