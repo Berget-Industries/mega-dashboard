@@ -31,6 +31,7 @@ export default function SendMail() {
   const [openAddPresetDialog, setOpenAddPresetDialog] = useState<boolean>(false);
   const [openChangePresetDialog, setOpenChangePresetDialog] = useState<boolean>(false);
   const [presets, setPresets] = useState<{ name: string; description: string }[]>([]);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const [selectedPreset, setSelectedPreset] = useState<{
     name: string;
     description: string;
@@ -41,13 +42,19 @@ export default function SendMail() {
   };
 
   const handleSendClick = () => {
-    console.log({
-      contactName: name,
-      contactEmail: email,
-      contactInformation: contactInfo,
-      messageInstructions: instruction,
-    });
-    setSnackbarOpen(true);
+    if (name === '' || email === '' || contactInfo === '' || instruction === '') {
+      setSnackbarMessage('Vänligen fyll i alla fält.');
+      setSnackbarOpen(true);
+    } else {
+      setSnackbarMessage('Mail skickat!');
+      console.log({
+        contactName: name,
+        contactEmail: email,
+        contactInformation: contactInfo,
+        messageInstructions: instruction,
+      });
+      setSnackbarOpen(true);
+    }
   };
 
   const handleSnackbarClose = (
@@ -217,7 +224,7 @@ export default function SendMail() {
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        message="Mail skickat!"
+        message={snackbarMessage}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         action={
           <Button color="primary" size="small" onClick={handleSnackbarClose}>

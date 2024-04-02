@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { Stack, Container, TextField } from '@mui/material';
+import { Stack, Container, TextField, DialogContent, DialogContentText } from '@mui/material';
 
 interface CreateOrgDialogProps {
   open: boolean;
@@ -40,7 +40,7 @@ export default function ChangePresetDialog(props: CreateOrgDialogProps) {
   const handleChangePreset = () => {
     const updatedPreset = { name: presetName, description: instruction };
     const updatedPresets = presets.map((preset) => {
-      if (preset.name === presetName) {
+      if (preset.name === presetName || preset.description === instruction) {
         return updatedPreset;
       }
       return preset;
@@ -58,6 +58,9 @@ export default function ChangePresetDialog(props: CreateOrgDialogProps) {
       aria-labelledby="responsive-dialog-title"
     >
       <DialogTitle id="responsive-dialog-title">Ändra preset</DialogTitle>
+      <DialogContent>
+        <DialogContentText>Här kan du ändra din preset.</DialogContentText>
+      </DialogContent>
       <Container>
         <TextField
           label="Preset namn"
@@ -73,7 +76,7 @@ export default function ChangePresetDialog(props: CreateOrgDialogProps) {
           fullWidth
           multiline
           rows={4}
-          sx={{ mb: 3, mt: 3 }}
+          // sx={{ mb: 3}}
         />
       </Container>
       <DialogActions sx={{ justifyContent: 'flex-end' }}>

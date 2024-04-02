@@ -1,12 +1,11 @@
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import { useTheme } from '@mui/material/styles';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Container, TextField } from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { Container, TextField, Snackbar, SnackbarCloseReason } from '@mui/material';
 import DialogContentText from '@mui/material/DialogContentText';
+import { useState } from 'react';
 
 interface AddPresetProps {
   open: boolean;
@@ -30,11 +29,26 @@ export default function AddPresetDialog(props: AddPresetProps) {
     presetName,
     setPresetName,
   } = props;
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
   const handleAddPreset = () => {
-    const newPreset = { name: presetName, description: instruction };
-    setPresets([...presets, newPreset]);
-    onClose();
+    if (presetName === '' || instruction === '') {
+      setSnackbarOpen(true);
+    } else {
+      const newPreset = { name: presetName, description: instruction };
+      setPresets([...presets, newPreset]);
+      onClose();
+    }
+  };
+
+  const handleSnackbarClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason
+  ): void => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   return (
@@ -69,6 +83,18 @@ export default function AddPresetDialog(props: AddPresetProps) {
           onChange={(e) => setInstruction(e.target.value)}
         />
       </Container>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        message="Vänligen fyll i alla fält."
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        action={
+          <Button color="primary" size="small" onClick={handleSnackbarClose}>
+            STÄNG
+          </Button>
+        }
+      />
       <DialogActions sx={{ justifyContent: 'flex-end' }}>
         <Button variant="outlined" onClick={onClose}>
           Avbryt
