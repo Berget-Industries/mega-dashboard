@@ -5,6 +5,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Stack, Container, TextField, DialogContent, DialogContentText } from '@mui/material';
+import { usePlugin, useGetOrganizationPlugins } from 'src/api/organization';
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 interface ChangePresetProps {
   open: boolean;
@@ -14,8 +16,9 @@ interface ChangePresetProps {
   presetName: string;
   setPresetName: (presetName: string) => void;
   onRemove: (presetName: string) => void;
-  setPresets: (options: { name: string; description: string }[]) => void;
-  presets: { name: string; description: string }[];
+  setPresets: (presets: { id: string | any; name: string; description: string }[]) => void;
+  presets: { id: string; name: string; description: string }[];
+  selectedPreset: { id: string; name: string; description: string } | null;
 }
 
 export default function ChangePresetDialog(props: ChangePresetProps) {
@@ -29,23 +32,79 @@ export default function ChangePresetDialog(props: ChangePresetProps) {
     onRemove,
     setPresets,
     presets,
+    selectedPreset,
   } = props;
 
-  const handleRemovePreset = () => {
-    console.log('Remove preset');
-    onRemove(presetName);
-    onClose();
+  const disabled = presets.some((preset) => preset.name.toLowerCase() === presetName.toLowerCase());
+
+  const { updatePluginConfig } = usePlugin();
+  const [selectedOrg] = useSelectedOrgContext();
+  const organizationPlugins = useGetOrganizationPlugins({
+    organizationId: selectedOrg?._id || '',
+  });
+
+  const handleRemovePreset = async () => {
+    const chainStarterPlugin = organizationPlugins.plugins.find(
+      (plugin) => plugin.name === 'chain-starter'
+    );
+
+    if (chainStarterPlugin) {
+      const newPresets =
+        chainStarterPlugin.config?.presets.filter(
+          (preset: { name: string }) => preset.name !== presetName
+        ) || [];
+
+      const updatedConfig = {
+        ...chainStarterPlugin.config,
+        presets: newPresets,
+      };
+
+      await updatePluginConfig({
+        pluginId: chainStarterPlugin._id,
+        organizationId: selectedOrg?._id || '',
+        config: updatedConfig,
+      })
+        .then(() => {
+          setPresets(newPresets);
+          onClose();
+        })
+        .catch((error) => {
+          console.error('Det gick inte att uppdatera plugin-konfigurationen', error);
+        });
+    }
   };
 
-  const handleChangePreset = () => {
-    const updatedPreset = { name: presetName, description: instruction };
-    const updatedPresets = presets.map((preset) => {
-      if (preset.name === presetName || preset.description === instruction) {
-        return updatedPreset;
+  const handleChangePreset = async () => {
+    const chainStarterPlugin = organizationPlugins.plugins.find(
+      (plugin) => plugin.name === 'chain-starter'
+    );
+
+    if (chainStarterPlugin) {
+      const currentPresets = chainStarterPlugin.config?.presets || [];
+
+      // Anta att du har ett sätt att få det nuvarande valda presetets ID.
+      const selectedPresetId = selectedPreset?.id;
+
+      const updatedPresets = currentPresets.map(
+        (preset: { id: string; name: string; description: string }) =>
+          preset.id === selectedPresetId
+            ? { ...preset, name: presetName, description: instruction }
+            : preset
+      );
+
+      try {
+        await updatePluginConfig({
+          pluginId: chainStarterPlugin._id,
+          organizationId: selectedOrg?._id || '',
+          config: { ...chainStarterPlugin.config, presets: updatedPresets },
+        });
+
+        setPresets(updatedPresets);
+      } catch (error) {
+        console.error('Det gick inte att uppdatera plugin-konfigurationen', error);
       }
-      return preset;
-    });
-    setPresets(updatedPresets);
+    }
+
     onClose();
   };
 
@@ -93,7 +152,12 @@ export default function ChangePresetDialog(props: ChangePresetProps) {
             <Button variant="outlined" onClick={onClose}>
               Avbryt
             </Button>
-            <Button variant="contained" color="primary" onClick={handleChangePreset}>
+            <Button
+              disabled={disabled}
+              variant="contained"
+              color="primary"
+              onClick={handleChangePreset}
+            >
               Ändra
             </Button>
           </Stack>

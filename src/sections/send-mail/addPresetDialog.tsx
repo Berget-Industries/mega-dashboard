@@ -1,19 +1,24 @@
+import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import { Container, TextField, Snackbar, SnackbarCloseReason } from '@mui/material';
 import DialogContentText from '@mui/material/DialogContentText';
-import { useState } from 'react';
+import { Container, TextField, Snackbar, SnackbarCloseReason } from '@mui/material';
+
+import { usePlugin, useGetOrganizationPlugins } from 'src/api/organization';
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 interface AddPresetProps {
   open: boolean;
   onClose: () => void;
   instruction: string;
   setInstruction: (instruction: string) => void;
-  setPresets: (options: { name: string; description: string }[]) => void;
-  presets: { name: string; description: string }[];
+  setPresets: (presets: { id: string | any; name: string; description: string }[]) => void;
+  presets: { id: string; name: string; description: string }[];
   presetName: string;
   setPresetName: (presetName: string) => void;
 }
@@ -30,13 +35,43 @@ export default function AddPresetDialog(props: AddPresetProps) {
     setPresetName,
   } = props;
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [selectedOrg] = useSelectedOrgContext();
+  const disabled =
+    presetName === '' ||
+    instruction === '' ||
+    presets.some((preset) => preset.name.toLowerCase() === presetName.toLowerCase());
+  const { updatePluginConfig } = usePlugin();
+  const organizationPlugins = useGetOrganizationPlugins({
+    organizationId: selectedOrg?._id || '',
+  });
 
-  const handleAddPreset = () => {
+  const handleAddPreset = async () => {
     if (presetName === '' || instruction === '') {
       setSnackbarOpen(true);
     } else {
-      const newPreset = { name: presetName, description: instruction };
+      const newPreset = { id: uuidv4(), name: presetName, description: instruction };
       setPresets([...presets, newPreset]);
+      console.log(newPreset);
+
+      const chainStarterPlugin = organizationPlugins.plugins.find(
+        (plugin) => plugin.name === 'chain-starter'
+      );
+
+      if (chainStarterPlugin) {
+        const currentPresets = chainStarterPlugin.config?.presets || [];
+
+        const updatedConfig = {
+          ...chainStarterPlugin.config,
+          presets: [...currentPresets, newPreset],
+        };
+
+        await updatePluginConfig({
+          pluginId: chainStarterPlugin._id,
+          organizationId: selectedOrg?._id || '',
+          config: updatedConfig,
+        });
+      }
+
       onClose();
     }
   };
@@ -99,7 +134,7 @@ export default function AddPresetDialog(props: AddPresetProps) {
         <Button variant="outlined" onClick={onClose}>
           Avbryt
         </Button>
-        <Button variant="contained" color="primary" onClick={handleAddPreset}>
+        <Button disabled={disabled} variant="contained" color="primary" onClick={handleAddPreset}>
           Lägg till
         </Button>
       </DialogActions>

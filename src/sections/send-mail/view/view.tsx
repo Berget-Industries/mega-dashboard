@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Typography from '@mui/material/Typography';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -18,6 +18,9 @@ import {
   SnackbarCloseReason,
 } from '@mui/material';
 
+import { useGetOrganizationPlugins } from 'src/api/organization';
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
+
 import AddPresetDialog from '../addPresetDialog';
 import ChangePresetDialog from '../changePresetDialog';
 
@@ -30,12 +33,35 @@ export default function SendMail() {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [openAddPresetDialog, setOpenAddPresetDialog] = useState<boolean>(false);
   const [openChangePresetDialog, setOpenChangePresetDialog] = useState<boolean>(false);
-  const [presets, setPresets] = useState<{ name: string; description: string }[]>([]);
+  const [presets, setPresets] = useState<{ id: string | any; name: string; description: string }[]>(
+    []
+  );
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [selectedPreset, setSelectedPreset] = useState<{
+    id: string;
     name: string;
     description: string;
   } | null>(null);
+  const [selectedOrg] = useSelectedOrgContext();
+  const { plugins } = useGetOrganizationPlugins({
+    organizationId: selectedOrg?._id || '',
+  });
+
+  console.log(presets);
+
+  useEffect(() => {
+    console.log('Vald organisation har ändrats:', selectedOrg?._id);
+    const fetchPluginsAndUpdatePresets = async () => {
+      const chainStarterPlugin = plugins.find((plugin) => plugin.name === 'chain-starter');
+      if (chainStarterPlugin && chainStarterPlugin.config.presets) {
+        setPresets(chainStarterPlugin.config.presets);
+      } else {
+        setPresets([]);
+      }
+    };
+
+    fetchPluginsAndUpdatePresets();
+  }, [plugins, selectedOrg?._id]);
 
   const removePreset = (presetToRemove: string) => {
     setPresets(presets.filter((preset) => preset.name !== presetToRemove));
@@ -180,7 +206,7 @@ export default function SendMail() {
           >
             {presets.map((preset) => (
               <MenuItem
-                key={preset.name}
+                key={preset.id}
                 value={preset.name}
                 sx={{
                   display: 'flex',
@@ -196,12 +222,9 @@ export default function SendMail() {
                   size="small"
                   onClick={(event) => {
                     event.stopPropagation();
-                    const currentPreset = presets.find((p) => p.name === preset.name);
-                    if (currentPreset) {
-                      setPresetName(currentPreset.name);
-                      setInstruction(currentPreset.description);
-                      setSelectedPreset(currentPreset);
-                    }
+                    setPresetName(preset.name);
+                    setInstruction(preset.description);
+                    setSelectedPreset(preset);
                     setOpenChangePresetDialog(true);
                   }}
                 >
@@ -256,6 +279,7 @@ export default function SendMail() {
         onRemove={removePreset}
         setPresets={setPresets}
         presets={presets}
+        selectedPreset={selectedPreset}
       />
     </Container>
   );
