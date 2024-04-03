@@ -18,6 +18,7 @@ const Organizations = lazy(() => import('src/pages/dashboard/admin/organizations
 const Users = lazy(() => import('src/pages/dashboard/admin/users'));
 const Tickets = lazy(() => import('src/pages/dashboard/tickets'));
 const TicketsDetails = lazy(() => import('src/pages/dashboard/ticket-details'));
+const SendMail = lazy(() => import('src/pages/dashboard/send-mail'));
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +52,14 @@ export const dashboardRoutes = [
           </RoleBasedGuard>
         ),
         path: 'api-keys',
+      },
+      {
+        element: (
+          <RoleBasedGuard>
+            <SendMail />
+          </RoleBasedGuard>
+        ),
+        path: 'send-mail',
       },
       {
         path: 'admin',
