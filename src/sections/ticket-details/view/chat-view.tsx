@@ -4,19 +4,20 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { paths } from 'src/routes/paths';
 import { useRouter, useSearchParams } from 'src/routes/hooks';
 
+import { useAuthContext } from 'src/auth/hooks';
 import { useGetConversation } from 'src/api/organization';
+import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
 
 import { useSettingsContext } from 'src/components/settings';
 
-import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
-
 import { IChatParticipant } from 'src/types/chat';
 
-import { useAuthContext } from 'src/auth/hooks';
 import ChatRoom from '../chat-room';
 import ChatMessageList from '../chat-message-list';
 
@@ -133,14 +134,19 @@ export default function ChatView() {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: { xs: 3, md: 5 },
-        }}
-      >
-        Konversation #{selectedConversationId}
-      </Typography>
+      <Stack alignItems="flex-start">
+        <IconButton sx={{ mb: 2 }} onClick={() => router.back()} aria-label="Gå tillbaka">
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography
+          variant="h4"
+          sx={{
+            mb: { xs: 3, md: 5 },
+          }}
+        >
+          Konversation #{selectedConversationId}
+        </Typography>
+      </Stack>
 
       <Stack component={Card} direction="row" sx={{ height: '72vh' }}>
         <Stack
