@@ -86,7 +86,7 @@ interface ITicketTable {
 }
 
 export default function TicketsTable({ conversations }: ITicketTable) {
-  const table = useTable({ defaultOrderBy: 'date' });
+  const table = useTable({ defaultOrderBy: 'createdAt', defaultOrder: 'desc' });
 
   const settings = useSettingsContext();
 
