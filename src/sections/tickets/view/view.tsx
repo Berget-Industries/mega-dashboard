@@ -8,6 +8,7 @@ import {
   BookingIllustration,
   CheckInIllustration,
   CheckoutIllustration,
+  UploadIllustration,
 } from 'src/assets/illustrations';
 import { useGetOrganizationConversations, useGetOrganizationMessages } from 'src/api/organization';
 
@@ -39,29 +40,43 @@ export default function OverviewBookingView() {
 
   const [numberOfProcessedTickets, setNumberOfProcessedTickets] = useState<number>(0);
   const [numberOfTicketsInQueue, setNumberOfTicketsInQueue] = useState<number>(0);
+  const [numberOfSentMail, setNumberOfSentMail] = useState<number>(0);
 
   useEffect(() => {
-    console.log(conversations);
+    const filteredConversations = conversations.filter((conversation) =>
+      conversation.messages.some((message) =>
+        message.llmOutput.some((output) => output.name === 'chain-starter')
+      )
+    );
+
     setNumberOfProcessedTickets(conversations.length);
+    setNumberOfSentMail(filteredConversations.length);
     setNumberOfTicketsInQueue(0);
   }, [conversations]);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
       <Grid container spacing={SPACING} disableEqualOverflow>
-        <Grid xs={12} md={6}>
+        <Grid xs={12} md={4}>
           <TicketSummaryCard
             title="Hanterade ärenden"
             total={numberOfProcessedTickets}
             icon={<BookingIllustration />}
           />
         </Grid>
-
-        <Grid xs={12} md={6}>
+        <Grid xs={12} md={4}>
           <TicketSummaryCard
             title="Väntar på hantering"
             total={numberOfTicketsInQueue}
             icon={<CheckoutIllustration />}
+          />
+        </Grid>
+
+        <Grid xs={12} md={4}>
+          <TicketSummaryCard
+            title="Mail utskickat"
+            total={numberOfSentMail}
+            icon={<UploadIllustration />}
           />
         </Grid>
 
