@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
 import LinearProgress from '@mui/material/LinearProgress';
 import CircularProgress from '@mui/material/CircularProgress';
-import LanIcon from '@mui/icons-material/Lan';
+import IosShareIcon from '@mui/icons-material/IosShare';
 import { Stack } from '@mui/system';
 import Paper from '@mui/material/Paper';
 
@@ -67,6 +67,27 @@ export default function OverviewAnalyticsView() {
 
   const [openPluginConfigId, setOpenPluginConfigId] = React.useState<string | null>(null);
   const [newPluginOpen, setNewPluginOpen] = React.useState<boolean>(false);
+
+  const exportPluginData = (plugin: IPlugin) => {
+    const data = {
+      name: plugin.name,
+      config: plugin.config,
+    };
+
+    const exportData = JSON.stringify(data, null, 2);
+
+    const blob = new Blob([exportData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${selectedOrg?.name}s_${plugin.name}.json`;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
     const typeInput = allPlugins.filter((_) => _.type === 'input');
@@ -212,6 +233,9 @@ export default function OverviewAnalyticsView() {
                     </IconButton>
                     <IconButton onClick={() => setConfirmDelete(plugin._id)} aria-label="delete">
                       <DeleteIcon />
+                    </IconButton>
+                    <IconButton>
+                      <IosShareIcon onClick={() => exportPluginData(plugin)} />
                     </IconButton>
                   </Stack>
                 </Container>
