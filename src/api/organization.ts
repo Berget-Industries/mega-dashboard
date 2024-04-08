@@ -27,8 +27,8 @@ export function useGetOrganizationMessages({
         {
           params: {
             organization,
-            startDate: encodeURIComponent(startDate.toISOString()),
-            endDate: encodeURIComponent(endDate.toISOString()),
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
           },
         },
       ]

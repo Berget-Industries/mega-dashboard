@@ -57,6 +57,7 @@ export function useNavData() {
     if (user?.systemAdmin) {
       items.push({ title: 'Anpassning', path: paths.dashboard.settings, icon: ICONS.lock });
       items.push({ title: 'API Nycklar', path: paths.dashboard.apiKeys, icon: ICONS.lock });
+      items.push({ title: 'Skicka mail', path: paths.dashboard.sendMail, icon: ICONS.mail });
     }
     const adminItems = [
       { title: 'Organisationer', path: paths.dashboard.admin.organizations, icon: ICONS.banking },

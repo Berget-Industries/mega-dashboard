@@ -6,6 +6,8 @@ export interface IPlugin {
   isActivated: boolean;
   config: Record<string, any>;
   organization: string;
+  worker?: string;
+  lastHeartbeat?: Date;
 }
 export interface IOrganization {
   _id: string;

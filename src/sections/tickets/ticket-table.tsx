@@ -86,7 +86,7 @@ interface ITicketTable {
 }
 
 export default function TicketsTable({ conversations }: ITicketTable) {
-  const table = useTable({ defaultOrderBy: 'date' });
+  const table = useTable({ defaultOrderBy: 'createdAt', defaultOrder: 'desc' });
 
   const settings = useSettingsContext();
 
@@ -110,7 +110,9 @@ export default function TicketsTable({ conversations }: ITicketTable) {
       type: _.messages
         .map((message) =>
           message.llmOutput
-            .map((llmOuput) => llmOuput.actions.map((action) => action.type).flat())
+            .map((llmOuput) =>
+              llmOuput?.actions ? llmOuput.actions.map((action) => action.type).flat() : []
+            )
             .flat()
         )
         .flat(),

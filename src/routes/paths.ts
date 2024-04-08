@@ -26,6 +26,7 @@ export const paths = {
     },
     settings: `${ROOTS.DASHBOARD}/settings`,
     apiKeys: `${ROOTS.DASHBOARD}/api-keys`,
+    sendMail: `${ROOTS.DASHBOARD}/send-mail`,
     // ADMIN
     admin: {
       organizations: `${ROOTS.DASHBOARD}/admin/organizations`,
