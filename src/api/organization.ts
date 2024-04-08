@@ -3,12 +3,15 @@ import { useMemo, useCallback } from 'react';
 
 import { poster, fetcher, endpoints } from 'src/utils/axios';
 
+// eslint-disable-next-line import/no-cycle
+import { IOrganizationData } from 'src/sections/organizations/table-row';
+
+import { IUser } from 'src/types/user';
 import { IMessage } from 'src/types/message';
+import { IConversation } from 'src/types/conversations';
 // eslint-disable-next-line import/no-cycle
 import { IOrganization, IPlugin } from 'src/types/organization';
-import { IConversation } from 'src/types/conversations';
 import { IAPIKeys, IAPIKeysCreate, IAPIKeysRemove } from 'src/types/APIKeys';
-import { IUser } from 'src/types/user';
 
 // ----------------------------------------------------------------------
 
@@ -385,4 +388,16 @@ export function useGetExportOrganization({ organizationId }: { organizationId?: 
   );
 
   return memoizedValue;
+}
+
+export function useImportOrganizationData() {
+  const importOrganizationData = useCallback(async (data: IOrganizationData) => {
+    const response = await poster(endpoints.admin.importOrganization, data);
+
+    await mutate(endpoints.admin.organizationList);
+
+    return response;
+  }, []);
+
+  return { importOrganizationData };
 }

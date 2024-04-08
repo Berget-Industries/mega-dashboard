@@ -54,7 +54,7 @@ export interface IOrganizationTableRow {
   };
 }
 
-interface IOrganizationData {
+export interface IOrganizationData {
   exportData: {
     organization: {
       name: string;
@@ -90,8 +90,11 @@ export default function OrderTableRow({ row, selected, users }: Props) {
   const exportOrganizationData = (data: IOrganizationData) => {
     console.log('Exporting organization data:', data);
     const { exportData } = data;
+    const dataToExport = {
+      importData: exportData,
+    };
 
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement('a');
