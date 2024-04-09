@@ -24,6 +24,7 @@ import {
   Grid,
 } from '@mui/material';
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
+import { useRef } from 'react';
 
 const CustomListSubheader = (props: any) => {
   const theme = useTheme();
@@ -61,14 +62,55 @@ type newPlugin = {
 };
 
 export default function FormDialog({ onClose, open }: FormDialogProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedOrg] = useSelectedOrgContext();
-  const { getAvailablePlugins, createNewPlugin } = usePlugin();
+  const { getAvailablePlugins, createNewPlugin, importPlugin } = usePlugin();
   const [fullScreen, setFullScreen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const [pluginConfig, setPluginConfig] = React.useState<Record<string, any>>({});
   const [defaultPlugin, setDefaultPlugin] = React.useState<availablePlugin | null>(null);
   const [availablePlugins, setAvailablePlugins] = React.useState<availablePlugin[]>([]);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file && file.type === 'application/json') {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target?.result;
+        try {
+          const jsonData = JSON.parse(text as string);
+
+          // Antag att jsonData innehåller de nycklar vi är intresserade av: name och config
+          // Se till att dessa fält faktiskt finns i filen du importerar
+          if (jsonData.name && jsonData.config) {
+            const dataToImport = {
+              organizationId: selectedOrg?._id ?? '', // Hämta organizationId från selectedOrg och tilldela en tom sträng som standardvärde om det är undefined
+              name: jsonData.name, // Namnet på pluginet extraherat från filen
+              config: jsonData.config, // Konfigurationsdata för pluginet extraherat från filen
+            };
+
+            console.log('Importerar filen:', dataToImport);
+
+            await importPlugin(dataToImport); // Anropa importPlugin med det strukturerade objektet
+            console.log('Filen har importerats!');
+            handleClose(); // Antagligen stänger du ett modalfönster eller liknande här
+          } else {
+            console.error('JSON-filen saknar nödvändiga nycklar: name eller config');
+          }
+        } catch (error) {
+          console.error('Ett fel inträffade vid import av filen:', error);
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      console.error('Vänligen välj en JSON-fil.');
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
 
   React.useEffect(() => {
     if (!selectedOrg?._id) return;
@@ -641,6 +683,16 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
             Avbryt
           </Button>
         </span>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          accept=".json"
+          onChange={handleFileSelect}
+        />
+        <Button variant="outlined" onClick={handleImportClick}>
+          Importera
+        </Button>
         <Button variant="outlined" onClick={() => setFullScreen(!fullScreen)}>
           Fullscreen
         </Button>
