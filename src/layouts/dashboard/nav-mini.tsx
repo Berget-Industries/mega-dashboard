@@ -44,7 +44,9 @@ export default function NavMini() {
           ...hideScroll.x,
         }}
       >
-        <TwoStack sx={{ mx: 'auto', my: 2 }} />
+        <Box sx={{ mx: 'auto', width: '60px', height: '130px', overflow: 'hidden', mt: -7 }}>
+          <TwoStack />
+        </Box>
 
         <NavSectionMini
           data={navData}

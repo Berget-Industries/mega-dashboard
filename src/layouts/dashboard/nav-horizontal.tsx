@@ -11,6 +11,8 @@ import { bgBlur } from 'src/theme/css';
 import Scrollbar from 'src/components/scrollbar';
 import { NavSectionHorizontal } from 'src/components/nav-section';
 
+import TwoStack from 'src/components/logo/twostacklogo';
+
 import { HEADER } from '../config-layout';
 import { useNavData } from './config-navigation';
 import HeaderShadow from '../common/header-shadow';

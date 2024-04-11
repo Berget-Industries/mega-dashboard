@@ -46,7 +46,7 @@ export default function Header({ onOpenNav }: Props) {
 
   const renderContent = (
     <>
-      {lgUp && isNavHorizontal && <TwoStack sx={{ mr: 2.5 }} />}
+      {lgUp && isNavHorizontal && <TwoStack sx={{ mr: 2, mb: 16 }} />}
 
       {!lgUp && (
         <IconButton onClick={onOpenNav}>
