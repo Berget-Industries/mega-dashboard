@@ -632,6 +632,55 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
                 });
               }}
             />
+            <TextField
+              id="_mailENameOfHuman"
+              label="Namn på människa"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.nameOfHuman || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
+              }}
+            />
+            <TextField
+              id="_mailEDescription"
+              label="Beskrivning"
+              margin="normal"
+              variant="outlined"
+              required
+              multiline
+              fullWidth
+              value={pluginConfig?.description || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
+              }}
+            />
+            <TextField
+              id="_mailEOnSuccess"
+              label="Vid lyckad kontakt"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.onSuccess || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
+              }}
+            />
           </>
         )}
       </DialogContent>

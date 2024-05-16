@@ -563,6 +563,61 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
         {/*
             OBS
             INPUTS FÖR
+            CHAT-CLIENT
+            OBS
+          */}
+
+        {plugin.name === 'chat-client' && (
+          <>
+            <Typography variant="h6" color="text.secondary">
+              Konfiguration av Chat-Client
+            </Typography>
+
+            <TextField
+              id="_chatClientName"
+              label="Namn"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.name}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({ ...pluginConfig, name: event.target.value });
+              }}
+            />
+            <TextField
+              id="_chatClientGreeting"
+              label="Välkomstmeddelande"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.greeting}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({ ...pluginConfig, greeting: event.target.value });
+              }}
+            />
+            <TextField
+              id="_chatClientColor"
+              label="Färg"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.color}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({ ...pluginConfig, color: event.target.value });
+              }}
+            />
+          </>
+        )}
+
+        {/*
+            OBS
+            INPUTS FÖR
             MEGA ASSISTANT - mailE
             OBS
           */}
@@ -597,6 +652,55 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
               required
               fullWidth
               value={pluginConfig?.subject || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
+              }}
+            />
+            <TextField
+              id="_mailENameOfHuman"
+              label="Namn på människa"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.nameOfHuman || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
+              }}
+            />
+            <TextField
+              id="_mailEDescription"
+              label="Beskrivning"
+              margin="normal"
+              variant="outlined"
+              required
+              multiline
+              fullWidth
+              value={pluginConfig?.description || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subject: event.target.value,
+                });
+              }}
+            />
+            <TextField
+              id="_mailEOnSuccess"
+              label="Vid lyckad kontakt"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.onSuccess || ''}
               onChange={(event) => {
                 event.preventDefault();
                 setPluginConfig({
