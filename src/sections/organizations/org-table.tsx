@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import TableContainer from '@mui/material/TableContainer';
-import { Container, Stack, Typography } from '@mui/material';
+import { Stack, Container, Typography } from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
@@ -27,7 +27,7 @@ import {
 import OrderTableFiltersResult from 'src/sections/tickets/order-table-filters-result';
 
 import { IUser } from 'src/types/user';
-import { IOrganization, IPlugin } from 'src/types/organization';
+import { IOrganization } from 'src/types/organization';
 import { IOrderTableFilters, IOrderTableFilterValue } from 'src/types/order';
 
 import CreateOrgDialog from './createOrgDialog';
