@@ -280,6 +280,31 @@ export function usePlugin() {
     []
   );
 
+  const importPlugin = useCallback(
+    async ({
+      organizationId,
+      name,
+      config,
+    }: {
+      organizationId: string;
+      name: string;
+      config: string;
+    }) => {
+      // Anta att 'poster' är din funktion för att göra POST-anrop
+      const response = await poster(endpoints.admin.plugin.import, {
+        organizationId,
+        name,
+        config,
+      });
+
+      // Anta att 'mutate' är en funktion för att uppdatera lokal cache eller liknande
+      await mutate(mutationKey(organizationId));
+
+      return response;
+    },
+    []
+  );
+
   return {
     activatePlugin,
     deactivatePlugin,
@@ -287,6 +312,7 @@ export function usePlugin() {
     getAvailablePlugins,
     createNewPlugin,
     removePlugin,
+    importPlugin,
   };
 }
 

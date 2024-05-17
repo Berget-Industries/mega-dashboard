@@ -76,6 +76,7 @@ export const endpoints = {
       activate: '/api/admin/plugin/activate',
       deactivate: '/api/admin/plugin/deactivate',
       available: '/api/admin/plugin/get-available-plugins',
+      import: '/api/admin/plugin/import-config',
     },
   },
 };
