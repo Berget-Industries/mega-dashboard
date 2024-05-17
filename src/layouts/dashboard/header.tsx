@@ -61,8 +61,7 @@ export default function Header({ onOpenNav }: Props) {
         spacing={{ xs: 0.5, sm: 1 }}
       >
         <OrganizationMenu />
-        <LanguagePopover />
-        {/* 
+        {/* <LanguagePopover />
 
         <NotificationsPopover />
 
