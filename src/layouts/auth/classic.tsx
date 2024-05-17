@@ -8,6 +8,7 @@ import { useResponsive } from 'src/hooks/use-responsive';
 import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
+import TwoStack from 'src/components/logo/twostacklogo';
 
 // ----------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
   const mdUp = useResponsive('up', 'md');
 
   const renderLogo = (
-    <Logo
+    <TwoStack
       sx={{
         zIndex: 9,
         position: 'absolute',

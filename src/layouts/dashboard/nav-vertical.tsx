@@ -11,6 +11,7 @@ import { useMockedUser } from 'src/hooks/use-mocked-user';
 
 import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
+import TwoStack from 'src/components/logo/twostacklogo';
 import { NavSectionVertical } from 'src/components/nav-section';
 
 import { NAV } from '../config-layout';
@@ -52,7 +53,7 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
         },
       }}
     >
-      <Logo sx={{ mt: 3, ml: 4, mb: 1 }} />
+      <TwoStack sx={{ mt: -5, ml: 2.5, mb: 8 }} />
 
       <NavSectionVertical
         data={navData}
