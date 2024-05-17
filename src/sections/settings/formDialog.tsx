@@ -103,45 +103,6 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 setPluginConfig({ ...pluginConfig, abilities: event.target.value });
               }}
             />
-
-            {pluginConfig.plugins &&
-              (pluginConfig.plugins as string[]).map((_, index) => (
-                <span key={index}>
-                  <TextField
-                    id="_abilities"
-                    label="Plugin"
-                    margin="normal"
-                    variant="outlined"
-                    required
-                    fullWidth
-                    value={_}
-                    onChange={(event) => {
-                      event.preventDefault();
-                      const newPluginConfig = { ...pluginConfig };
-                      newPluginConfig.plugins[index] = event.target.value;
-                      setPluginConfig(newPluginConfig);
-                    }}
-                  />
-                  {index !== 0 && (
-                    <Button
-                      onClick={() => {
-                        const newPluginConfig = { ...pluginConfig };
-                        newPluginConfig.plugins.splice(index, 1);
-                        setPluginConfig(newPluginConfig);
-                      }}
-                    >
-                      Ta bort
-                    </Button>
-                  )}
-                </span>
-              ))}
-            <Button
-              onClick={() =>
-                setPluginConfig({ ...pluginConfig, plugins: [...(pluginConfig.plugins || []), ''] })
-              }
-            >
-              Lägg till plugin
-            </Button>
           </>
         )}
 

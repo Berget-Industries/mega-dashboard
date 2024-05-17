@@ -202,7 +202,6 @@ export default function OverviewAnalyticsView() {
                             {/* {plugin.worker && <span>Worker: {plugin.worker}</span>} */}
                           </Stack>
                         )}
-                        {plugin.name === 'mega-assistant-alex' && plugin.config.plugins.join(', ')}
                         {plugin.name === 'mega-assistant-eva' && plugin.config.model}
                         {plugin.name === 'auto-filter' &&
                           `${
