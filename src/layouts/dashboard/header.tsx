@@ -53,10 +53,6 @@ export default function Header({ onOpenNav }: Props) {
         </IconButton>
       )}
 
-      <Stack flexGrow={1} direction="row" alignItems="center" justifyContent="flex-start">
-        <Searchbar />
-      </Stack>
-
       <Stack
         flexGrow={1}
         direction="row"
