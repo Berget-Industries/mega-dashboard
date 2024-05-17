@@ -20,7 +20,7 @@ jobs:
         run: npm install
 
       - name: Build Docker image
-        run: docker build . -t willebergh/mega-dashboard:production --build-arg REACT_APP_HOST_API=https://api.tss.stage.berget.industries
+        run: docker build . -t willebergh/mega-dashboard:production --build-arg REACT_APP_HOST_API=https://api.twostack-system.se
 
       - name: Login to Docker Hub
         uses: docker/login-action@v1
