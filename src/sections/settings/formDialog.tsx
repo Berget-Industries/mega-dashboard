@@ -311,6 +311,10 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 setPluginConfig({
                   ...pluginConfig,
                   imapConfig: { ...pluginConfig.imapConfig, user: event.target.value },
+                  nodemailerConfig: {
+                    ...pluginConfig.nodemailerConfig,
+                    auth: { ...pluginConfig.nodemailerConfig.auth, user: event.target.value },
+                  },
                 });
               }}
             />
@@ -329,6 +333,13 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 setPluginConfig({
                   ...pluginConfig,
                   imapConfig: { ...pluginConfig.imapConfig, password: event.target.value },
+                  nodemailerConfig: {
+                    ...pluginConfig.nodemailerConfig,
+                    auth: {
+                      ...pluginConfig.nodemailerConfig.auth,
+                      pass: event.target.value,
+                    },
+                  },
                 });
               }}
             />
@@ -433,6 +444,26 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                   nodemailerConfig: {
                     ...pluginConfig.nodemailerConfig,
                     port: Number(event.target.value),
+                  },
+                });
+              }}
+            />
+
+            <TextField
+              id="_smtpService"
+              label="SMTP Service"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig.nodemailerConfig?.service || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  nodemailerConfig: {
+                    ...pluginConfig.nodemailerConfig,
+                    service: event.target.value,
                   },
                 });
               }}
