@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Dialog,
   DialogTitle,
@@ -6,11 +8,14 @@ import {
   DialogActions,
   Button,
   TextField,
+  Stack,
 } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { usePostOrganizations } from 'src/api/organization';
+
 import { useGetUsers } from 'src/api/user';
+import { usePostOrganizations, useImportOrganizationData } from 'src/api/organization';
+
 import { CustomDropdown } from 'src/components/custom-dropdown';
+
 import { IUser } from 'src/types/user';
 
 interface CreateOrgDialogProps {
@@ -19,13 +24,39 @@ interface CreateOrgDialogProps {
 }
 
 export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { createOrganization } = usePostOrganizations();
+  const { importOrganizationData } = useImportOrganizationData();
   const { users, usersLoading, usersError } = useGetUsers({});
-
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
   const [organizationName, setOrganizationName] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file && file.type === 'application/json') {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target?.result;
+        try {
+          const jsonData = JSON.parse(text as string);
+          await importOrganizationData(jsonData);
+          console.log('Filen har importerats!');
+          handleClose();
+        } catch (error) {
+          console.error('Ett fel inträffade vid import av filen:', error);
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      console.error('Vänligen välj en JSON-fil.');
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleCloseDialog = () => {
     setSelectedUsers([]);
@@ -98,15 +129,27 @@ export default function CreateOrgDialog({ open, handleClose }: CreateOrgDialogPr
         <Button variant="outlined" onClick={handleCloseDialog}>
           Avbryt
         </Button>
-        <LoadingButton
-          loading={isLoading}
-          onClick={handleCreateOrganization}
-          type="submit"
-          variant="contained"
-          color="primary"
-        >
-          Lägg till
-        </LoadingButton>
+        <Stack flexDirection="row" gap={2}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".json"
+            onChange={handleFileSelect}
+          />
+          <Button variant="outlined" onClick={handleImportClick}>
+            Importera
+          </Button>
+          <LoadingButton
+            loading={isLoading}
+            onClick={handleCreateOrganization}
+            type="submit"
+            variant="contained"
+            color="primary"
+          >
+            Lägg till
+          </LoadingButton>
+        </Stack>
       </DialogActions>
     </Dialog>
   );
