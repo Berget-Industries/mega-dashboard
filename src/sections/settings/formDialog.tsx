@@ -664,7 +664,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 event.preventDefault();
                 setPluginConfig({
                   ...pluginConfig,
-                  subject: event.target.value,
+                  nameOfHuman: event.target.value,
                 });
               }}
             />
@@ -681,7 +681,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 event.preventDefault();
                 setPluginConfig({
                   ...pluginConfig,
-                  subject: event.target.value,
+                  description: event.target.value,
                 });
               }}
             />
@@ -697,7 +697,7 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 event.preventDefault();
                 setPluginConfig({
                   ...pluginConfig,
-                  subject: event.target.value,
+                  onSuccess: event.target.value,
                 });
               }}
             />
