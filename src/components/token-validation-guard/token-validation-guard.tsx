@@ -20,14 +20,18 @@ const TokenValidationGuard: React.FC<TokenValidationGuardProps> = ({ children })
   useEffect(() => {
     const validateToken = async () => {
       if (!token) {
-        setIsValid(false);
+        console.log('No token found in URL');
         return;
       }
 
+      console.log('Token found:', token);
+
       try {
         const response = await checkIfTokenIsValid(token);
-        setIsValid((response as { isValid: boolean }).isValid);
+        console.log('API response:', response);
+        setIsValid(true);
       } catch (error) {
+        console.error('Error during token validation:', error);
         setIsValid(false);
       }
     };
@@ -36,6 +40,7 @@ const TokenValidationGuard: React.FC<TokenValidationGuardProps> = ({ children })
   }, [token, checkIfTokenIsValid]);
 
   if (!isValid) {
+    console.log('Token is not valid or validation failed');
     return (
       <Container
         component={MotionContainer}
@@ -55,6 +60,7 @@ const TokenValidationGuard: React.FC<TokenValidationGuardProps> = ({ children })
     );
   }
 
+  console.log('Token is valid, rendering children');
   return <>{children}</>;
 };
 
