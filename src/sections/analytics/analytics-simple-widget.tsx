@@ -13,7 +13,7 @@ import { ColorSchema } from 'src/theme/palette';
 
 interface Props extends CardProps {
   title: string;
-  total: number;
+  total: number | string;
   icon: React.ReactNode;
   color?: ColorSchema;
   unit?: string;
