@@ -141,7 +141,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsSimpleWidget
             title="Hanterade ärenden"
-            total={numberOfProcessedTickets}
+            total={numberOfProcessedTickets !== 0 ? numberOfProcessedTickets : '-'}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
           />
         </Grid>
@@ -150,7 +150,11 @@ export default function OverviewAnalyticsView() {
           <AnalyticsSimpleWidget
             title="Sparad tid"
             unit="min"
-            total={(60 * 5 * numberOfProcessedTickets - savedTime) / 60}
+            total={
+              numberOfProcessedTickets !== 0
+                ? (60 * 5 * numberOfProcessedTickets - savedTime) / 60
+                : '-'
+            }
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
           />
         </Grid>
@@ -158,7 +162,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsSimpleWidget
             title="Använda tokens"
-            total={usedTokens}
+            total={usedTokens !== 0 ? usedTokens : '-'}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />
         </Grid>
@@ -167,7 +171,7 @@ export default function OverviewAnalyticsView() {
           <AnalyticsSimpleWidget
             unit="s"
             title="Genomsnittlig svarstid"
-            total={averageResponse}
+            total={averageResponse !== 0 ? averageResponse : '-'}
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
           />
         </Grid>
