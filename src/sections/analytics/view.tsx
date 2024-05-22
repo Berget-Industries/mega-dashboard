@@ -1,43 +1,51 @@
+import { useCallback, useEffect, useState } from 'react';
+import {
+  startOfMonth,
+  endOfMonth,
+  getMonth,
+  endOfToday,
+  getYear,
+  startOfDay,
+  endOfDay,
+} from 'date-fns';
+
+import { Stack } from '@mui/system';
 import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
-import { IMessage } from 'src/types/message';
-
-import { alpha, useTheme } from '@mui/material/styles';
-import { useSettingsContext } from 'src/components/settings';
-import { startOfMonth, endOfMonth, getMonth, lastDayOfMonth, getDay, getDate } from 'date-fns';
 
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
-import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
-import AnalyticsSimpleWidget from './analytics-simple-widget';
-import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
 
+import { useSettingsContext } from 'src/components/settings';
+
+import { IMessage } from 'src/types/message';
+
+import UltimateDateRanger from './UltimateDateRanger';
+import AnalyticsSimpleWidget from './analytics-simple-widget';
+import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
 import { useGetOrganizationMessages } from '../../api/organization';
+import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
 
 // ----------------------------------------------------------------------
 
-const today = new Date();
-const currentYear = today.getFullYear();
-const currentMonth = getMonth(today);
-const currentDay = getDate(today);
-const lastDayOfCurrentMonth = lastDayOfMonth(currentMonth).getDate();
-const firstDayOfCurrentMonth = 1;
-
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
-  const theme = useTheme();
-
-  const startDate = new Date(currentYear, currentMonth, firstDayOfCurrentMonth, 0, 0, 0);
-  const endDate = new Date(currentYear, currentMonth, lastDayOfCurrentMonth, 23, 59, 59);
   const [selectedOrg] = useSelectedOrgContext();
 
-  const { messages, messagesLoading, messagesError, messagesValidating, messagesEmpty } =
-    useGetOrganizationMessages({
-      organization: selectedOrg?._id || '',
-      startDate,
-      endDate,
-    });
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(endOfToday());
+
+  const handleStartDateChange = (date: Date | null) => {
+    if (date) {
+      setStartDate(date);
+    }
+  };
+
+  const { messages } = useGetOrganizationMessages({
+    organization: selectedOrg?._id || '',
+    startDate: startOfDay(startDate),
+    endDate: endOfDay(startDate),
+  });
 
   const [savedTime, setSavedTime] = useState<number>(0);
   const [usedTokens, setUsedTokens] = useState<number>(0);
@@ -55,23 +63,33 @@ export default function OverviewAnalyticsView() {
     typeQuestion: [],
   });
 
-  function groupItemsByDay(items: any[]) {
-    const allDays: { day: number; tickets: IMessage[] }[] = [...Array(currentDay)].map((_) => ({
-      day: new Date().setDate(_),
-      tickets: [],
-    }));
+  const groupItemsByDay = useCallback(
+    (items: IMessage[]) => {
+      const start = startOfMonth(startDate);
+      const end = endOfMonth(endDate);
+      const daysInRange = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-    items.forEach((item) => {
-      const date = new Date(item.createdAt);
-      const day = date.getDate();
-      allDays[day - 1].tickets.push(item);
-    });
+      const allDays = Array.from({ length: daysInRange }, (_, index) => {
+        const day = new Date(start.getTime() + index * 1000 * 60 * 60 * 24);
+        return { day, tickets: [] as IMessage[] };
+      });
 
-    return allDays;
-  }
+      items.forEach((item) => {
+        const date = new Date(item.createdAt);
+        const dayIndex = Math.floor((date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+        if (dayIndex >= 0 && dayIndex < daysInRange) {
+          allDays[dayIndex].tickets.push(item);
+        }
+      });
+
+      return allDays;
+    },
+    [startDate, endDate]
+  );
 
   useEffect(() => {
     if (!messages) return;
+
     const splitByMonth = groupItemsByDay(messages);
     setSortedTickets({
       typeNewBooking: splitByMonth.map((_) =>
@@ -121,21 +139,34 @@ export default function OverviewAnalyticsView() {
     setUsedTokens(newUsedTokens);
     setAverageResponse(newAverageResponseTime);
     setNumberOfProcessedTickets(newNumberOfProcessedTickets);
-  }, [messages]);
+  }, [messages, groupItemsByDay]);
 
-  const getLabels = () =>
-    [...Array(lastDayOfCurrentMonth)].map((_, i) => `${currentYear}/${currentMonth + 1}/${i + 1}`);
+  const getLabels = () => {
+    const start = startOfMonth(startDate);
+    const end = endOfMonth(endDate);
+    const daysInRange = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+    return Array.from({ length: daysInRange }, (_, index) => {
+      const day = new Date(start.getTime() + index * 1000 * 60 * 60 * 24);
+      return `${getYear(day)}/${getMonth(day) + 1}/${day.getDate()}`;
+    });
+  };
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: { xs: 3, md: 5 },
-        }}
-      >
-        Statistik 📈📉
-      </Typography>
+      <Stack flexDirection="row" justifyContent="space-between" alignItems="center">
+        <Typography
+          variant="h4"
+          sx={{
+            mb: { xs: 3, md: 5 },
+          }}
+        >
+          Statistik 📈📉
+        </Typography>
+        <Stack>
+          <UltimateDateRanger startDate={startDate} setStartDate={handleStartDateChange} />
+        </Stack>
+      </Stack>
 
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
