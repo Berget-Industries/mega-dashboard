@@ -11,6 +11,19 @@ interface TokenValidationGuardProps {
   children: ReactNode;
 }
 
+interface ResponseType {
+  status: string;
+  message: string;
+}
+
+const isValidResponse = (response: any): response is ResponseType =>
+  response &&
+  typeof response === 'object' &&
+  'status' in response &&
+  typeof response.status === 'string' &&
+  'message' in response &&
+  typeof response.message === 'string';
+
 const TokenValidationGuard: React.FC<TokenValidationGuardProps> = ({ children }) => {
   const [isValid, setIsValid] = useState<boolean>(false);
   const { checkIfTokenIsValid } = usePostCheckIfTokenValid();
@@ -20,7 +33,7 @@ const TokenValidationGuard: React.FC<TokenValidationGuardProps> = ({ children })
   useEffect(() => {
     const validateToken = async () => {
       if (!token) {
-        console.log('No token found in URL');
+        setIsValid(false);
         return;
       }
 
@@ -29,7 +42,12 @@ const TokenValidationGuard: React.FC<TokenValidationGuardProps> = ({ children })
       try {
         const response = await checkIfTokenIsValid(token);
         console.log('API response:', response);
-        setIsValid(true);
+        if (isValidResponse(response) && response.status === 'success') {
+          setIsValid(true);
+        } else {
+          console.error('Invalid response or status not success:', response);
+          setIsValid(false);
+        }
       } catch (error) {
         console.error('Error during token validation:', error);
         setIsValid(false);
