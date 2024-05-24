@@ -1,11 +1,13 @@
 import { useMemo, useState, useCallback, useTransition } from 'react';
 import {
+  format,
   endOfWeek,
   endOfToday,
   endOfMonth,
   startOfWeek,
   startOfToday,
   startOfMonth,
+  eachDayOfInterval,
 } from 'date-fns';
 
 import { Stack } from '@mui/system';
@@ -59,7 +61,8 @@ export default function OverviewAnalyticsView() {
 
   const groupItemsByHour = useCallback(
     (items: IMessage[]) => {
-      const allHours = Array.from({ length: 24 }, (_, hour) => ({
+      const currentHour = new Date().getHours();
+      const allHours = Array.from({ length: currentHour + 1 }, (_, hour) => ({
         hour,
         tickets: [] as IMessage[],
       }));
@@ -68,13 +71,34 @@ export default function OverviewAnalyticsView() {
         const date = new Date(item.createdAt);
         if (date >= dates.startDate && date <= dates.endDate) {
           const hour = date.getHours();
-          if (allHours[hour]) {
+          if (hour <= currentHour) {
             allHours[hour].tickets.push(item);
           }
         }
       });
 
-      return allHours;
+      return allHours.sort((a, b) => a.hour - b.hour);
+    },
+    [dates]
+  );
+
+  const groupItemsByDay = useCallback(
+    (items: IMessage[]) => {
+      const today = endOfToday();
+      const allDays = eachDayOfInterval({ start: dates.startDate, end: today }).map((date) => ({
+        date: format(date, 'yyyy-MM-dd'),
+        tickets: [] as IMessage[],
+      }));
+
+      items.forEach((item) => {
+        const date = format(new Date(item.createdAt), 'yyyy-MM-dd');
+        const day = allDays.find((d) => d.date === date);
+        if (day) {
+          day.tickets.push(item);
+        }
+      });
+
+      return allDays;
     },
     [dates]
   );
@@ -87,6 +111,32 @@ export default function OverviewAnalyticsView() {
     },
     [startTransition]
   );
+
+  const getCategories = () => {
+    switch (range) {
+      case 'week':
+        return eachDayOfInterval({ start: dates.startDate, end: endOfToday() }).map((date) =>
+          format(date, 'EEE')
+        );
+      case 'month':
+        return eachDayOfInterval({ start: dates.startDate, end: endOfToday() }).map((date) =>
+          format(date, 'dd')
+        );
+      default:
+        return Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+    }
+  };
+
+  const getData = () => {
+    switch (range) {
+      case 'week':
+        return groupItemsByDay(filter).map((day) => day.tickets.length);
+      case 'month':
+        return groupItemsByDay(filter).map((day) => day.tickets.length);
+      default:
+        return groupItemsByHour(filter).map((hour) => hour.tickets.length);
+    }
+  };
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -171,7 +221,8 @@ export default function OverviewAnalyticsView() {
           <Dashboard24hGraph
             title="Hanterade Ärenden"
             subheader="(+43%) mer än igår"
-            data={groupItemsByHour(filter).map((_) => _.tickets.length)}
+            data={getData()}
+            categories={getCategories()}
           />
         </Grid>
         <Grid xs={12} md={6} lg={4}>
