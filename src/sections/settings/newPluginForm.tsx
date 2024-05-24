@@ -725,6 +725,38 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
             />
           </>
         )}
+
+        {/*
+            OBS
+            INPUTS FÖR
+            MEGA ASSISTANT - KNOWLEDGE
+            OBS
+          */}
+
+        {defaultPlugin?.name === 'mega-assistant-alex-knowledge' && (
+          <>
+            <Typography variant="h6" color="text.secondary">
+              Kunskap till Alex
+            </Typography>
+
+            <TextField
+              id="_knowledgeCollection"
+              label="Kollektion"
+              margin="normal"
+              variant="outlined"
+              required
+              fullWidth
+              value={pluginConfig?.collection || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  collection: event.target.value,
+                });
+              }}
+            />
+          </>
+        )}
       </DialogContent>
       <DialogActions>
         <span style={{ flexGrow: 1 }}>
