@@ -1,53 +1,55 @@
+import { useCallback, useEffect, useState } from 'react';
+import { startOfDay, endOfDay, format, differenceInCalendarDays } from 'date-fns';
+
+import { Stack } from '@mui/system';
 import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
-import { IMessage } from 'src/types/message';
-
-import { alpha, useTheme } from '@mui/material/styles';
-import { useSettingsContext } from 'src/components/settings';
-import { startOfMonth, endOfMonth, getMonth, lastDayOfMonth, getDay, getDate } from 'date-fns';
 
 import { useSelectedOrgContext } from 'src/layouts/common/context/org-menu-context';
-import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
+import { useSettingsContext } from 'src/components/settings';
+import { IMessage } from 'src/types/message';
+
+import UltimateDateRanger from './UltimateDateRanger';
 import AnalyticsSimpleWidget from './analytics-simple-widget';
-import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
-
+import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
 import { useGetOrganizationMessages } from '../../api/organization';
-
-// ----------------------------------------------------------------------
-
-const today = new Date();
-const currentYear = today.getFullYear();
-const currentMonth = getMonth(today);
-const currentDay = getDate(today);
-const lastDayOfCurrentMonth = lastDayOfMonth(currentMonth).getDate();
-const firstDayOfCurrentMonth = 1;
+import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
 
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
-  const theme = useTheme();
-
-  const startDate = new Date(currentYear, currentMonth, firstDayOfCurrentMonth, 0, 0, 0);
-  const endDate = new Date(currentYear, currentMonth, lastDayOfCurrentMonth, 23, 59, 59);
   const [selectedOrg] = useSelectedOrgContext();
 
-  const { messages, messagesLoading, messagesError, messagesValidating, messagesEmpty } =
-    useGetOrganizationMessages({
-      organization: selectedOrg?._id || '',
-      startDate,
-      endDate,
-    });
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
+
+  const handleStartDateChange = (date: Date | null) => {
+    if (date) {
+      setStartDate(date);
+    }
+  };
+
+  const handleEndDateChange = (date: Date | null) => {
+    if (date) {
+      setEndDate(date);
+    }
+  };
+
+  const { messages } = useGetOrganizationMessages({
+    organization: selectedOrg?._id || '',
+    startDate: startOfDay(startDate),
+    endDate: endOfDay(endDate),
+  });
 
   const [savedTime, setSavedTime] = useState<number>(0);
   const [usedTokens, setUsedTokens] = useState<number>(0);
   const [averageResponse, setAverageResponse] = useState<number>(0);
   const [numberOfProcessedTickets, setNumberOfProcessedTickets] = useState<number>(0);
   const [sortedTickets, setSortedTickets] = useState<{
-    typeNewBooking: IMessage[][];
-    typeChangeBooking: IMessage[][];
-    typeRemoveBooking: IMessage[][];
-    typeQuestion: IMessage[][];
+    typeNewBooking: IMessage[];
+    typeChangeBooking: IMessage[];
+    typeRemoveBooking: IMessage[];
+    typeQuestion: IMessage[];
   }>({
     typeNewBooking: [],
     typeChangeBooking: [],
@@ -55,52 +57,72 @@ export default function OverviewAnalyticsView() {
     typeQuestion: [],
   });
 
-  function groupItemsByDay(items: any[]) {
-    const allDays: { day: number; tickets: IMessage[] }[] = [...Array(currentDay)].map((_) => ({
-      day: new Date().setDate(_),
-      tickets: [],
-    }));
+  const groupItemsByDay = useCallback(
+    (items: IMessage[]) => {
+      const start = startOfDay(startDate);
+      const end = endOfDay(endDate);
+      const daysInRange = differenceInCalendarDays(end, start) + 1;
 
-    items.forEach((item) => {
-      const date = new Date(item.createdAt);
-      const day = date.getDate();
-      allDays[day - 1].tickets.push(item);
-    });
+      const allDays = Array.from({ length: daysInRange }, (_, index) => {
+        const day = new Date(start.getTime() + index * 1000 * 60 * 60 * 24);
+        return { day, tickets: [] as IMessage[] };
+      });
 
-    return allDays;
-  }
+      items.forEach((item) => {
+        const date = new Date(item.createdAt);
+        const dayIndex = differenceInCalendarDays(date, start);
+        if (dayIndex >= 0 && dayIndex < daysInRange) {
+          allDays[dayIndex].tickets.push(item);
+        }
+      });
+
+      return allDays;
+    },
+    [startDate, endDate]
+  );
 
   useEffect(() => {
     if (!messages) return;
-    const splitByMonth = groupItemsByDay(messages);
-    setSortedTickets({
-      typeNewBooking: splitByMonth.map((_) =>
-        _.tickets.filter((message) =>
+
+    const groupedByDay = groupItemsByDay(messages);
+
+    const newSortedTickets = {
+      typeNewBooking: [] as IMessage[],
+      typeChangeBooking: [] as IMessage[],
+      typeRemoveBooking: [] as IMessage[],
+      typeQuestion: [] as IMessage[],
+    };
+
+    groupedByDay.forEach(({ tickets }) => {
+      newSortedTickets.typeNewBooking.push(
+        ...tickets.filter((message) =>
           message.llmOutput.some((llmOutput) =>
             llmOutput.actions.find((x) => x.type === 'skapa-reservation')
           )
         )
-      ),
-      typeChangeBooking: splitByMonth.map((_) =>
-        _.tickets.filter((message) =>
+      );
+      newSortedTickets.typeChangeBooking.push(
+        ...tickets.filter((message) =>
           message.llmOutput.some((llmOutput) =>
             llmOutput.actions.find((x) => x.type === 'redigera-reservation')
           )
         )
-      ),
-      typeRemoveBooking: splitByMonth.map((_) =>
-        _.tickets.filter((message) =>
+      );
+      newSortedTickets.typeRemoveBooking.push(
+        ...tickets.filter((message) =>
           message.llmOutput.some((llmOutput) =>
             llmOutput.actions.find((x) => x.type === 'avboka-reservation')
           )
         )
-      ),
-      typeQuestion: splitByMonth.map((_) =>
-        _.tickets.filter((message) =>
+      );
+      newSortedTickets.typeQuestion.push(
+        ...tickets.filter((message) =>
           message.llmOutput.some((llmOutput) => llmOutput.actions.length === 0)
         )
-      ),
+      );
     });
+
+    setSortedTickets(newSortedTickets);
 
     const newSavedTime = messages.reduce(
       (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.responseTime / 1000, 0),
@@ -121,21 +143,39 @@ export default function OverviewAnalyticsView() {
     setUsedTokens(newUsedTokens);
     setAverageResponse(newAverageResponseTime);
     setNumberOfProcessedTickets(newNumberOfProcessedTickets);
-  }, [messages]);
+  }, [messages, groupItemsByDay]);
 
-  const getLabels = () =>
-    [...Array(lastDayOfCurrentMonth)].map((_, i) => `${currentYear}/${currentMonth + 1}/${i + 1}`);
+  const getLabels = () => {
+    const start = startOfDay(startDate);
+    const end = endOfDay(endDate);
+    const daysInRange = differenceInCalendarDays(end, start) + 1;
+
+    return Array.from({ length: daysInRange }, (_, index) => {
+      const day = new Date(start.getTime() + index * 1000 * 60 * 60 * 24);
+      return format(day, 'yyyy/MM/dd');
+    });
+  };
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: { xs: 3, md: 5 },
-        }}
-      >
-        Statistik 📈📉
-      </Typography>
+      <Stack flexDirection="row" justifyContent="space-between" alignItems="center">
+        <Typography
+          variant="h4"
+          sx={{
+            mb: { xs: 3, md: 5 },
+          }}
+        >
+          Statistik 📈📉
+        </Typography>
+        <Stack>
+          <UltimateDateRanger
+            startDate={startDate}
+            setStartDate={handleStartDateChange}
+            endDate={endDate}
+            setEndDate={handleEndDateChange}
+          />
+        </Stack>
+      </Stack>
 
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
@@ -187,25 +227,43 @@ export default function OverviewAnalyticsView() {
                   name: 'Skapade bokningar',
                   type: 'line',
                   fill: 'solid',
-                  data: sortedTickets.typeNewBooking.map((_) => _.length),
+                  data: groupItemsByDay(messages).map(
+                    (_) =>
+                      _.tickets.filter((message) => sortedTickets.typeNewBooking.includes(message))
+                        .length
+                  ),
                 },
                 {
                   name: 'Bokningsändringar',
                   type: 'line',
                   fill: 'solid',
-                  data: sortedTickets.typeChangeBooking.map((_) => _.length),
+                  data: groupItemsByDay(messages).map(
+                    (_) =>
+                      _.tickets.filter((message) =>
+                        sortedTickets.typeChangeBooking.includes(message)
+                      ).length
+                  ),
                 },
                 {
                   name: 'Frågor',
                   type: 'line',
                   fill: 'solid',
-                  data: sortedTickets.typeQuestion.map((_) => _.length),
+                  data: groupItemsByDay(messages).map(
+                    (_) =>
+                      _.tickets.filter((message) => sortedTickets.typeQuestion.includes(message))
+                        .length
+                  ),
                 },
                 {
                   name: 'Avbokningar',
                   type: 'line',
                   fill: 'solid',
-                  data: sortedTickets.typeRemoveBooking.map((_) => _.length),
+                  data: groupItemsByDay(messages).map(
+                    (_) =>
+                      _.tickets.filter((message) =>
+                        sortedTickets.typeRemoveBooking.includes(message)
+                      ).length
+                  ),
                 },
               ],
             }}
@@ -219,25 +277,19 @@ export default function OverviewAnalyticsView() {
               series: [
                 {
                   label: 'Skapade bokningar',
-                  value: sortedTickets.typeNewBooking
-                    .map((_) => _.length)
-                    .reduce((c, n) => c + n, 0),
+                  value: sortedTickets.typeNewBooking.length,
                 },
                 {
                   label: 'Frågor',
-                  value: sortedTickets.typeQuestion.map((_) => _.length).reduce((c, n) => c + n, 0),
+                  value: sortedTickets.typeQuestion.length,
                 },
                 {
                   label: 'Avbokningar',
-                  value: sortedTickets.typeRemoveBooking
-                    .map((_) => _.length)
-                    .reduce((c, n) => c + n, 0),
+                  value: sortedTickets.typeRemoveBooking.length,
                 },
                 {
                   label: 'Bokningsändringar',
-                  value: sortedTickets.typeRemoveBooking
-                    .map((_) => _.length)
-                    .reduce((c, n) => c + n, 0),
+                  value: sortedTickets.typeChangeBooking.length,
                 },
               ],
             }}
@@ -247,7 +299,7 @@ export default function OverviewAnalyticsView() {
         <Grid xs={12} md={8}>
           <AnalyticsTicketsTimeRangeChart
             title="Använda Tokens"
-            subheader="asjdjklahsdjkha"
+            subheader=""
             chart={{
               labels: getLabels(),
               series: [
