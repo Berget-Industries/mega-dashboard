@@ -305,11 +305,25 @@ export function usePlugin() {
     []
   );
 
+  const uploadKnowledge = useCallback(
+    async ({ document, collection }: { document: string; collection: string }) => {
+      // Anta att 'poster' är din funktion för att göra POST-anrop
+      const response = await poster(endpoints.admin.plugin.uploadKnowledge, {
+        document,
+        collection,
+      });
+
+      return response;
+    },
+    []
+  );
+
   return {
     activatePlugin,
     deactivatePlugin,
     updatePluginConfig,
     getAvailablePlugins,
+    uploadKnowledge,
     createNewPlugin,
     removePlugin,
     importPlugin,

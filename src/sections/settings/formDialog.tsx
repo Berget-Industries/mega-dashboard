@@ -19,8 +19,9 @@ interface FormDialogProps {
 }
 
 export default function FormDialog({ plugin, onClose }: FormDialogProps) {
+  const knowledgeDocUploadRef = React.useRef<HTMLInputElement>(null);
   const [selectedOrg] = useSelectedOrgContext();
-  const { updatePluginConfig } = usePlugin();
+  const { updatePluginConfig, uploadKnowledge } = usePlugin();
   const [fullScreen, setFullScreen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [pluginConfig, setPluginConfig] = React.useState<Record<string, any>>({});
@@ -37,6 +38,32 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
       setPluginConfig(plugin.config);
     }
   }, [plugin]);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file && file.type === 'text/plain') {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const document = e.target?.result;
+
+        if (typeof document !== 'string') {
+          return;
+        }
+
+        const data = {
+          document,
+          collection: plugin?.config?.collection || '',
+        };
+
+        console.log(data);
+
+        uploadKnowledge(data);
+      };
+      reader.readAsText(file);
+    } else {
+      console.error('Vänligen välj en textfil.');
+    }
+  };
 
   if (!plugin) return null;
 
@@ -733,6 +760,13 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
                 });
               }}
             />
+            <input
+              type="file"
+              ref={knowledgeDocUploadRef}
+              style={{ display: 'none' }}
+              accept=".txt"
+              onChange={handleFileSelect}
+            />
           </>
         )}
       </DialogContent>
@@ -742,6 +776,11 @@ export default function FormDialog({ plugin, onClose }: FormDialogProps) {
             Avbryt
           </Button>
         </span>
+        {plugin.name === 'mega-assistant-alex-knowledge' && (
+          <Button variant="outlined" onClick={() => knowledgeDocUploadRef.current?.click()}>
+            Ladda upp dokument
+          </Button>
+        )}
         <Button variant="outlined" onClick={() => setFullScreen(!fullScreen)}>
           Fullscreen
         </Button>

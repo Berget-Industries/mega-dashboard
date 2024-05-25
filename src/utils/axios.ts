@@ -73,10 +73,11 @@ export const endpoints = {
       list: '/api/admin/plugin/list',
       remove: '/api/admin/plugin/remove',
       update: '/api/admin/plugin/update',
+      import: '/api/admin/plugin/import-config',
       activate: '/api/admin/plugin/activate',
       deactivate: '/api/admin/plugin/deactivate',
       available: '/api/admin/plugin/get-available-plugins',
-      import: '/api/admin/plugin/import-config',
+      uploadKnowledge: '/api/admin/plugin/upload-knowledge',
     },
   },
 };
