@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import TableContainer from '@mui/material/TableContainer';
-import { Container, Stack, Typography } from '@mui/material';
+import { Container, Snackbar, SnackbarCloseReason, Stack, Typography } from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
@@ -95,12 +95,24 @@ function applyFilter({
 // ----------------------------------------------------------------------
 
 export default function UserTable({ users, organizations }: UserTableProps) {
+  const [snackbarMessage, setSnackbarMessage] = React.useState<string>('');
+  const [snackbarOpen, setSnackbarOpen] = React.useState<boolean>(false);
   const table = useTable({ defaultOrderBy: 'date' });
   const confirm = useBoolean();
   const [tableData, setTableData] = useState<IUserTableRow[]>([]);
   const [open, setOpen] = React.useState(false);
   const handleToggleDialog = () => {
     setOpen(!open);
+  };
+
+  const handleSnackbarClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason
+  ): void => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   useEffect(() => {
@@ -218,6 +230,8 @@ export default function UserTable({ users, organizations }: UserTableProps) {
                       row={row}
                       selected={table.selected.includes(row.id)}
                       organization={organizations}
+                      setSnackbarMessage={setSnackbarMessage}
+                      setSnackbarOpen={setSnackbarOpen}
                     />
                   ))}
                 <TableEmptyRows
@@ -241,6 +255,18 @@ export default function UserTable({ users, organizations }: UserTableProps) {
         />
       </Card>
       <CreateOrgDialog open={open} handleClose={handleToggleDialog} organization={organizations} />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        action={
+          <Button color="primary" size="small" onClick={handleSnackbarClose}>
+            STÄNG
+          </Button>
+        }
+      />
     </Container>
   );
 }
