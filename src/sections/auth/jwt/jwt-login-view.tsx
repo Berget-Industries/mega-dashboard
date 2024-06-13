@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigate } from 'react-router';
 
 import Link from '@mui/material/Link';
 import Alert from '@mui/material/Alert';
@@ -26,6 +27,8 @@ import FormProvider, { RHFTextField } from 'src/components/hook-form';
 // ----------------------------------------------------------------------
 
 export default function JwtLoginView() {
+  const navigate = useNavigate();
+
   const { login } = useAuthContext();
 
   const router = useRouter();
@@ -108,7 +111,13 @@ export default function JwtLoginView() {
         }}
       />
 
-      <Link variant="body2" color="inherit" underline="always" sx={{ alignSelf: 'flex-end' }}>
+      <Link
+        onClick={() => navigate('/auth/jwt/reset-password')}
+        component={Link}
+        variant="body2"
+        color="inherit"
+        sx={{ alignSelf: 'flex-end', cursor: 'pointer' }}
+      >
         Glömt lösenord?
       </Link>
 
