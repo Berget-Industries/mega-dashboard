@@ -18,6 +18,9 @@ import {
   SelectChangeEvent,
   TextField,
   Stack,
+  Snackbar,
+  SnackbarCloseReason,
+  Button,
 } from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
@@ -31,6 +34,7 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import { CustomDropdown } from 'src/components/custom-dropdown/index';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { useRequestPassLink } from 'src/api/user';
 
 import { IOrganization } from 'src/types/organization';
 
@@ -60,9 +64,18 @@ type Props = {
   row: IUserTableRow;
   selected: boolean;
   organization: IOrganization[];
+  setSnackbarOpen: (open: boolean) => void;
+  setSnackbarMessage: (message: string) => void;
 };
 
-export default function OrderTableRow({ row, selected, organization }: Props) {
+export default function OrderTableRow({
+  row,
+  selected,
+  organization,
+  setSnackbarMessage,
+  setSnackbarOpen,
+}: Props) {
+  const { requestLink } = useRequestPassLink();
   const { user } = row;
   const [open, setOpen] = React.useState(false);
   const [selectedOrg, setSelectedOrg] = React.useState<string[]>([]);
@@ -143,6 +156,17 @@ export default function OrderTableRow({ row, selected, organization }: Props) {
         arrow="right-top"
         sx={{ width: 220 }}
       >
+        <MenuItem
+          onClick={() => {
+            requestLink(user.email);
+            setSnackbarMessage(`Skickade återställnigslänk till: ${user.email}`);
+            setSnackbarOpen(true);
+            popover.onClose();
+          }}
+        >
+          <Iconify icon="material-symbols:lock-reset-rounded" />
+          Skicka återställningslänk
+        </MenuItem>
         <MenuItem
           onClick={() => {
             popover.onClose();

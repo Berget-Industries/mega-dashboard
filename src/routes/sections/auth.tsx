@@ -12,6 +12,7 @@ import TokenValidationGuard from 'src/components/token-validation-guard/token-va
 // JWT
 const JwtLoginPage = lazy(() => import('src/pages/auth/jwt/login'));
 const JwtRegisterPage = lazy(() => import('src/pages/auth/jwt/register'));
+const JwtResetPassView = lazy(() => import('src/pages/auth/jwt/reset-pass'));
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +45,14 @@ const authJwt = {
     {
       path: 'register',
       element: <JwtRegisterPageWithValidation />,
+    },
+    {
+      path: 'reset-password',
+      element: (
+        <AuthClassicLayout>
+          <JwtResetPassView />
+        </AuthClassicLayout>
+      ),
     },
   ],
 };

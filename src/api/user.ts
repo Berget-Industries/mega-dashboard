@@ -49,3 +49,14 @@ export function useRemoveUsers() {
 
   return { removeUser };
 }
+
+export function useRequestPassLink() {
+  const requestLink = useCallback(async (email: string) => {
+    const response = await poster(endpoints.auth.requestResetPasswordToken, { email });
+    console.log('Länken har skickats till', response);
+
+    return response;
+  }, []);
+
+  return { requestLink };
+}
