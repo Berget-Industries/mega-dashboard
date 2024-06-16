@@ -19,6 +19,7 @@ const UltimateDateRanger: React.FC<UltimateDateRangerProps> = ({
   <LocalizationProvider dateAdapter={AdapterDateFns}>
     <Box display="flex" justifyContent="center" alignItems="center" mb={5} flexGrow={1} gap={2}>
       <DesktopDatePicker
+        timezone="system"
         value={startDate}
         onChange={setStartDate}
         slots={{ textField: TextField }}
@@ -29,6 +30,7 @@ const UltimateDateRanger: React.FC<UltimateDateRangerProps> = ({
         }}
       />
       <DesktopDatePicker
+        timezone="system"
         value={endDate}
         onChange={setEndDate}
         slots={{ textField: TextField }}

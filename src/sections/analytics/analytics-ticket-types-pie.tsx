@@ -60,7 +60,7 @@ export default function AnalyticsTicketTypesPie({ title, subheader, chart, ...ot
       colors: [theme.palette.background.paper],
     },
     legend: {
-      show: false,
+      show: true,
       floating: true,
       position: 'bottom',
       horizontalAlign: 'center',

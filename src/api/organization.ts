@@ -6,6 +6,7 @@ import { poster, fetcher, endpoints } from 'src/utils/axios';
 // eslint-disable-next-line import/no-cycle
 import { IOrganizationData } from 'src/sections/organizations/table-row';
 
+import { IStats } from 'src/types/stats';
 import { IUser } from 'src/types/user';
 import { IMessage } from 'src/types/message';
 import { IConversation } from 'src/types/conversations';
@@ -440,4 +441,42 @@ export function useImportOrganizationData() {
   }, []);
 
   return { importOrganizationData };
+}
+
+export function useGetPluginStats({
+  organization,
+  startDate,
+  endDate,
+}: {
+  organization: string;
+  startDate: Date;
+  endDate: Date;
+}) {
+  const URL = organization
+    ? [
+        endpoints.organization.pluginStats,
+        {
+          params: {
+            organization,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+          },
+        },
+      ]
+    : '';
+
+  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+
+  const memoizedValue = useMemo(
+    () => ({
+      stats: (data?.stats as IStats) || [],
+      messagesLoading: isLoading,
+      messagesError: error,
+      messagesValidating: isValidating,
+      messagesEmpty: !isLoading && !data?.stats.length,
+    }),
+    [data?.stats, error, isLoading, isValidating]
+  );
+
+  return memoizedValue;
 }

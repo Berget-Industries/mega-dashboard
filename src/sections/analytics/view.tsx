@@ -13,15 +13,27 @@ import { IMessage } from 'src/types/message';
 import UltimateDateRanger from './UltimateDateRanger';
 import AnalyticsSimpleWidget from './analytics-simple-widget';
 import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
-import { useGetOrganizationMessages } from '../../api/organization';
+import { useGetOrganizationMessages, useGetPluginStats } from '../../api/organization';
 import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
+
+interface Stats {
+  [pluginName: string]: {
+    [question: string]: {
+      [date: string]: number;
+    };
+  };
+}
 
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const [selectedOrg] = useSelectedOrgContext();
 
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const today = new Date();
+  const minus30Days = new Date(today);
+  minus30Days.setDate(today.getDate() - 30);
+
+  const [startDate, setStartDate] = useState<Date>(minus30Days);
+  const [endDate, setEndDate] = useState<Date>(today);
 
   const handleStartDateChange = (date: Date | null) => {
     if (date) {
@@ -34,6 +46,12 @@ export default function OverviewAnalyticsView() {
       setEndDate(date);
     }
   };
+
+  const { stats } = useGetPluginStats({
+    organization: selectedOrg?._id || '',
+    startDate: startOfDay(startDate),
+    endDate: endOfDay(endDate),
+  }) as unknown as { stats: Stats };
 
   const { messages } = useGetOrganizationMessages({
     organization: selectedOrg?._id || '',
@@ -80,6 +98,16 @@ export default function OverviewAnalyticsView() {
     },
     [startDate, endDate]
   );
+
+  useEffect(() => {
+    const baboska = () => {
+      const test = stats;
+
+      return test;
+    };
+
+    baboska();
+  });
 
   useEffect(() => {
     if (!messages) return;
@@ -152,8 +180,42 @@ export default function OverviewAnalyticsView() {
 
     return Array.from({ length: daysInRange }, (_, index) => {
       const day = new Date(start.getTime() + index * 1000 * 60 * 60 * 24);
-      return format(day, 'yyyy/MM/dd');
+      return format(day, 'yyyy-MM-dd'); // Matcha datumformatet i stats
     });
+  };
+
+  const generateChartData = (pluginData: { [question: string]: { [date: string]: number } }) => {
+    const firstObject = Object.values(pluginData)[0] || {};
+    const labels = Object.keys(firstObject);
+
+    console.log(labels);
+
+    const series = Object.entries(pluginData).map(([question, data]) => ({
+      name: question,
+      type: 'line',
+      fill: 'solid',
+      data: labels.map((label) => data[label] || 0),
+    }));
+
+    return {
+      labels,
+      series,
+    };
+  };
+
+  const getShortPluginName = (pluginName: string) => {
+    if (pluginName === 'knowledge') {
+      return 'Databas sökningar';
+    }
+
+    if (pluginName.startsWith('mega-assistant-alex-mailE-sendToHuman')) {
+      const split = pluginName.split('__');
+      const str = `Skickade mail till ${split[1]}`;
+
+      return str;
+    }
+
+    return pluginName;
   };
 
   return (
@@ -216,7 +278,7 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} md={8}>
+        {/* <Grid xs={12} md={8}>
           <AnalyticsTicketsTimeRangeChart
             title="Hanterade Ärenden"
             subheader=""
@@ -294,7 +356,30 @@ export default function OverviewAnalyticsView() {
               ],
             }}
           />
-        </Grid>
+        </Grid> */}
+
+        {Object.entries(stats).map(([pluginName, pluginData]) => (
+          <>
+            <Grid xs={12} md={8} key={pluginName}>
+              <AnalyticsTicketsTimeRangeChart
+                title={`${getShortPluginName(pluginName)}`}
+                subheader=""
+                chart={generateChartData(pluginData)}
+              />
+            </Grid>
+            <Grid xs={12} md={4}>
+              <AnalyticsTicketTypesPie
+                title="Fördelning"
+                chart={{
+                  series: Object.entries(pluginData).map(([question, value]) => ({
+                    label: question,
+                    value: Object.values(value).reduce((prev, next) => prev + next, 0),
+                  })),
+                }}
+              />
+            </Grid>
+          </>
+        ))}
 
         <Grid xs={12} md={8}>
           <AnalyticsTicketsTimeRangeChart
@@ -334,6 +419,32 @@ export default function OverviewAnalyticsView() {
                       (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.total, 0),
                       0
                     )
+                  ),
+                },
+              ],
+            }}
+          />
+        </Grid>
+        <Grid xs={12} md={4}>
+          <AnalyticsTicketTypesPie
+            title="Fördelning"
+            chart={{
+              series: [
+                {
+                  label: 'Input',
+                  value: messages.reduce(
+                    (prev, next) =>
+                      prev + next.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.input, 0),
+                    0
+                  ),
+                },
+
+                {
+                  label: 'Output',
+                  value: messages.reduce(
+                    (prev, next) =>
+                      prev + next.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.output, 0),
+                    0
                   ),
                 },
               ],
