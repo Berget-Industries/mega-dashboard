@@ -28,8 +28,12 @@ export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const [selectedOrg] = useSelectedOrgContext();
 
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const today = new Date();
+  const minus30Days = new Date(today);
+  minus30Days.setDate(today.getDate() - 30);
+
+  const [startDate, setStartDate] = useState<Date>(minus30Days);
+  const [endDate, setEndDate] = useState<Date>(today);
 
   const handleStartDateChange = (date: Date | null) => {
     if (date) {
@@ -181,7 +185,11 @@ export default function OverviewAnalyticsView() {
   };
 
   const generateChartData = (pluginData: { [question: string]: { [date: string]: number } }) => {
-    const labels = getLabels();
+    const firstObject = Object.values(pluginData)[0] || {};
+    const labels = Object.keys(firstObject);
+
+    console.log(labels);
+
     const series = Object.entries(pluginData).map(([question, data]) => ({
       name: question,
       type: 'line',
@@ -196,12 +204,18 @@ export default function OverviewAnalyticsView() {
   };
 
   const getShortPluginName = (pluginName: string) => {
-    const pluginNameMap: { [key: string]: string } = {
-      knowledge: 'Knowledge',
-      'mega-assistant-alex-mailE-sendToHuman__Hugo': 'Support Tekniker',
-      'mega-assistant-alex-mailE-sendToHuman__Benni': 'Produktions Ansvarig',
-    };
-    return pluginNameMap[pluginName] || pluginName;
+    if (pluginName === 'knowledge') {
+      return 'Databas sökningar';
+    }
+
+    if (pluginName.startsWith('mega-assistant-alex-mailE-sendToHuman')) {
+      const split = pluginName.split('__');
+      const str = `Skickade mail till ${split[1]}`;
+
+      return str;
+    }
+
+    return pluginName;
   };
 
   return (
@@ -264,7 +278,7 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} md={8}>
+        {/* <Grid xs={12} md={8}>
           <AnalyticsTicketsTimeRangeChart
             title="Hanterade Ärenden"
             subheader=""
@@ -342,16 +356,29 @@ export default function OverviewAnalyticsView() {
               ],
             }}
           />
-        </Grid>
+        </Grid> */}
 
         {Object.entries(stats).map(([pluginName, pluginData]) => (
-          <Grid xs={12} md={8} key={pluginName}>
-            <AnalyticsTicketsTimeRangeChart
-              title={`Statistik för ${getShortPluginName(pluginName)}`}
-              subheader=""
-              chart={generateChartData(pluginData)}
-            />
-          </Grid>
+          <>
+            <Grid xs={12} md={8} key={pluginName}>
+              <AnalyticsTicketsTimeRangeChart
+                title={`${getShortPluginName(pluginName)}`}
+                subheader=""
+                chart={generateChartData(pluginData)}
+              />
+            </Grid>
+            <Grid xs={12} md={4}>
+              <AnalyticsTicketTypesPie
+                title="Fördelning"
+                chart={{
+                  series: Object.entries(pluginData).map(([question, value]) => ({
+                    label: question,
+                    value: Object.values(value).reduce((prev, next) => prev + next, 0),
+                  })),
+                }}
+              />
+            </Grid>
+          </>
         ))}
 
         <Grid xs={12} md={8}>
@@ -392,6 +419,32 @@ export default function OverviewAnalyticsView() {
                       (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.total, 0),
                       0
                     )
+                  ),
+                },
+              ],
+            }}
+          />
+        </Grid>
+        <Grid xs={12} md={4}>
+          <AnalyticsTicketTypesPie
+            title="Fördelning"
+            chart={{
+              series: [
+                {
+                  label: 'Input',
+                  value: messages.reduce(
+                    (prev, next) =>
+                      prev + next.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.input, 0),
+                    0
+                  ),
+                },
+
+                {
+                  label: 'Output',
+                  value: messages.reduce(
+                    (prev, next) =>
+                      prev + next.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.output, 0),
+                    0
                   ),
                 },
               ],

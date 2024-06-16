@@ -41,13 +41,17 @@ export default function AnalyticsWebsiteVisits({ title, subheader, chart, ...oth
     xaxis: {
       type: 'datetime',
       labels: {
-        datetimeUTC: false,
+        datetimeUTC: true,
+        format: 'dd MMM',
+        showDuplicates: false,
       },
+      stepSize: 3,
     },
 
     dataLabels: {
       enabled: false,
     },
+
     markers: {
       size: 0,
     },
