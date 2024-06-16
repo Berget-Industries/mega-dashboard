@@ -16,6 +16,14 @@ import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
 import { useGetOrganizationMessages, useGetPluginStats } from '../../api/organization';
 import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
 
+interface Stats {
+  [pluginName: string]: {
+    [question: string]: {
+      [date: string]: number;
+    };
+  };
+}
+
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
   const [selectedOrg] = useSelectedOrgContext();
@@ -39,7 +47,7 @@ export default function OverviewAnalyticsView() {
     organization: selectedOrg?._id || '',
     startDate: startOfDay(startDate),
     endDate: endOfDay(endDate),
-  });
+  }) as unknown as { stats: Stats };
 
   const { messages } = useGetOrganizationMessages({
     organization: selectedOrg?._id || '',
@@ -168,8 +176,32 @@ export default function OverviewAnalyticsView() {
 
     return Array.from({ length: daysInRange }, (_, index) => {
       const day = new Date(start.getTime() + index * 1000 * 60 * 60 * 24);
-      return format(day, 'yyyy/MM/dd');
+      return format(day, 'yyyy-MM-dd'); // Matcha datumformatet i stats
     });
+  };
+
+  const generateChartData = (pluginData: { [question: string]: { [date: string]: number } }) => {
+    const labels = getLabels();
+    const series = Object.entries(pluginData).map(([question, data]) => ({
+      name: question,
+      type: 'line',
+      fill: 'solid',
+      data: labels.map((label) => data[label] || 0),
+    }));
+
+    return {
+      labels,
+      series,
+    };
+  };
+
+  const getShortPluginName = (pluginName: string) => {
+    const pluginNameMap: { [key: string]: string } = {
+      knowledge: 'Knowledge',
+      'mega-assistant-alex-mailE-sendToHuman__Hugo': 'Support Tekniker',
+      'mega-assistant-alex-mailE-sendToHuman__Benni': 'Produktions Ansvarig',
+    };
+    return pluginNameMap[pluginName] || pluginName;
   };
 
   return (
@@ -312,50 +344,15 @@ export default function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} md={8}>
-          <AnalyticsTicketsTimeRangeChart
-            title="Vanliga frågor - Hugo"
-            subheader=""
-            chart={{
-              labels: getLabels(),
-              series: [
-                {
-                  name: 'Input',
-                  type: 'line',
-                  fill: 'solid',
-                  data: groupItemsByDay(messages).map((_) =>
-                    _.tickets.reduce(
-                      (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.input, 0),
-                      0
-                    )
-                  ),
-                },
-                {
-                  name: 'Output',
-                  type: 'line',
-                  fill: 'solid',
-                  data: groupItemsByDay(messages).map((_) =>
-                    _.tickets.reduce(
-                      (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.output, 0),
-                      0
-                    )
-                  ),
-                },
-                {
-                  name: 'Total',
-                  type: 'line',
-                  fill: 'solid',
-                  data: groupItemsByDay(messages).map((_) =>
-                    _.tickets.reduce(
-                      (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.total, 0),
-                      0
-                    )
-                  ),
-                },
-              ],
-            }}
-          />
-        </Grid>
+        {Object.entries(stats).map(([pluginName, pluginData]) => (
+          <Grid xs={12} md={8} key={pluginName}>
+            <AnalyticsTicketsTimeRangeChart
+              title={`Statistik för ${getShortPluginName(pluginName)}`}
+              subheader=""
+              chart={generateChartData(pluginData)}
+            />
+          </Grid>
+        ))}
 
         <Grid xs={12} md={8}>
           <AnalyticsTicketsTimeRangeChart
