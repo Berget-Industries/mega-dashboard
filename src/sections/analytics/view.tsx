@@ -13,7 +13,7 @@ import { IMessage } from 'src/types/message';
 import UltimateDateRanger from './UltimateDateRanger';
 import AnalyticsSimpleWidget from './analytics-simple-widget';
 import AnalyticsTicketTypesPie from './analytics-ticket-types-pie';
-import { useGetOrganizationMessages } from '../../api/organization';
+import { useGetOrganizationMessages, useGetPluginStats } from '../../api/organization';
 import AnalyticsTicketsTimeRangeChart from './analytics-tickets-time-range-chart';
 
 export default function OverviewAnalyticsView() {
@@ -34,6 +34,12 @@ export default function OverviewAnalyticsView() {
       setEndDate(date);
     }
   };
+
+  const { stats } = useGetPluginStats({
+    organization: selectedOrg?._id || '',
+    startDate: startOfDay(startDate),
+    endDate: endOfDay(endDate),
+  });
 
   const { messages } = useGetOrganizationMessages({
     organization: selectedOrg?._id || '',
@@ -80,6 +86,16 @@ export default function OverviewAnalyticsView() {
     },
     [startDate, endDate]
   );
+
+  useEffect(() => {
+    const baboska = () => {
+      const test = stats;
+
+      return test;
+    };
+
+    baboska();
+  });
 
   useEffect(() => {
     if (!messages) return;
@@ -290,6 +306,51 @@ export default function OverviewAnalyticsView() {
                 {
                   label: 'Bokningsändringar',
                   value: sortedTickets.typeChangeBooking.length,
+                },
+              ],
+            }}
+          />
+        </Grid>
+
+        <Grid xs={12} md={8}>
+          <AnalyticsTicketsTimeRangeChart
+            title="Vanliga frågor - Hugo"
+            subheader=""
+            chart={{
+              labels: getLabels(),
+              series: [
+                {
+                  name: 'Input',
+                  type: 'line',
+                  fill: 'solid',
+                  data: groupItemsByDay(messages).map((_) =>
+                    _.tickets.reduce(
+                      (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.input, 0),
+                      0
+                    )
+                  ),
+                },
+                {
+                  name: 'Output',
+                  type: 'line',
+                  fill: 'solid',
+                  data: groupItemsByDay(messages).map((_) =>
+                    _.tickets.reduce(
+                      (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.output, 0),
+                      0
+                    )
+                  ),
+                },
+                {
+                  name: 'Total',
+                  type: 'line',
+                  fill: 'solid',
+                  data: groupItemsByDay(messages).map((_) =>
+                    _.tickets.reduce(
+                      (c, n) => c + n.llmOutput.reduce((cc, nn) => cc + nn.usedTokens.total, 0),
+                      0
+                    )
+                  ),
                 },
               ],
             }}

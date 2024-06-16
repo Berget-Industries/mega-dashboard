@@ -52,6 +52,7 @@ export const endpoints = {
     conversations: '/api/dashboard/conversations',
     conversation: '/api/dashboard/conversation',
     messages: '/api/dashboard/messages',
+    pluginStats: '/api/dashboard/plugin-stats',
   },
   admin: {
     organizationList: '/api/admin/organization/list',
