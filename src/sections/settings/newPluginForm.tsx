@@ -708,6 +708,23 @@ export default function FormDialog({ onClose, open }: FormDialogProps) {
               }}
             />
             <TextField
+              id="_mailEsubjectForStats"
+              label="Statistik Insammling"
+              margin="normal"
+              variant="outlined"
+              required
+              multiline
+              fullWidth
+              value={pluginConfig?.subjectForStats || ''}
+              onChange={(event) => {
+                event.preventDefault();
+                setPluginConfig({
+                  ...pluginConfig,
+                  subjectForStats: event.target.value,
+                });
+              }}
+            />
+            <TextField
               id="_mailEOnSuccess"
               label="Vid lyckad kontakt"
               margin="normal"
